@@ -3,7 +3,7 @@ import { openRouteList } from './routeLists'
 import OpenRoutesLayout from 'src/components/OpenRoutesLayout'
 import { Route, Routes } from 'react-router-dom'
 import { ProtectedRoute } from 'src/components/AuthProvider/ProtectedRoute'
-import App from 'src/App'
+import LayoutContainer from 'src/components/LayoutContainer'
 
 const RouterConfig = () => {
   return (
@@ -22,10 +22,10 @@ const RouterConfig = () => {
         })}
         <Route
           key={'app'}
-          path="/"
+          path="/*"
           element={
             <ProtectedRoute>
-              <App />
+              <LayoutContainer />
             </ProtectedRoute>
           }
         />

@@ -1,22 +1,30 @@
-import * as AllNavigation from "src/utils/routes";
-import Login from "src/pages/Login";
-import AddProperty from "src/pages/AddProperty";
+import * as AllNavigation from 'src/utils/routes'
+import * as AllPages from 'src/pages'
+
 export const openRouteList = [
   {
-    key: "login-route",
-    component: Login,
+    key: 'login-route',
+    component: AllPages.Login,
     path: AllNavigation.LOGIN,
     props: { newAccount: false },
   },
   {
-    key: "register-route",
-    component: Login,
+    key: 'register-route',
+    component: AllPages.Login,
     path: AllNavigation.NEW_ACCOUNT,
     props: { newAccount: true },
   },
+]
+
+export const routeLists = [
   {
-    key: "properties-route",
-    component: AddProperty,
+    key: 'root',
+    component: AllPages.Dashboard,
+    path: AllNavigation.ROOT,
+  },
+  {
+    key: 'add-property',
+    component: AllPages.AddProperty,
     path: AllNavigation.ADD_PROPERTY,
   },
-];
+]
