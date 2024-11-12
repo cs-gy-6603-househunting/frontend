@@ -1,6 +1,7 @@
 export const AUTH_NOT_REQUIRED_APIS = [
-  "/authenticate",
-  "/register",
+  "api/auth/login/",
+  "api/auth/register/",
+  "api/auth/verify/",
 ];
 
 

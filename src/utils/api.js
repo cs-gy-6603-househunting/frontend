@@ -19,8 +19,6 @@ const getTokenFromStorage = (url) => {
         isRefreshToken: true,
         refreshToken: `${getLocalStorageData(localStorageKey.refreshToken)}`,
       }
-    } else if (url === '/api/auth/login/') {
-      return {}
     } else {
       return {
         authorization: `Bearer ${getLocalStorageData(localStorageKey.token)}`,
@@ -54,6 +52,14 @@ const handleUnauthorizedAccess = (err) => {
   }
 }
 
+const handleForbiddenAccess = (err) => {
+  if (err.response.data && err.response.data.error === 'Email Unverified') {
+    return err.response.data
+  } else {
+    //handle others
+  }
+}
+
 const api = axios.create({
   baseURL: import.meta.env.VITE_APP_BASE_URL,
   timeout: 30000,
@@ -71,9 +77,7 @@ api.interceptors.request.use(async (config) => {
 
 api.interceptors.response.use(
   (response) => {
-    console.log(response)
-    if (response.status === 200) {
-      console.log(response)
+    if (response.status === 200 || response.status === 201) {
       return response.data
     } else {
       return null
@@ -88,6 +92,10 @@ api.interceptors.response.use(
         return api(originalRequest)
       } else if (err.response.status && err.response.status === 401) {
         handleUnauthorizedAccess(err)
+      } else if (err.response.status && err.response.status === 403) {
+        return handleForbiddenAccess(err)
+      } else if (err.response.status && err.response.status === 400) {
+        return {error: err.response.data}
       } else {
         //open notification
       }

@@ -14,7 +14,7 @@ export const LoginContainer = styled.div`
   box-shadow: 0px 8px 32px 0px #0000001f;
   border-radius: 8px;
   overflow: hidden;
-  height: 70%;
+  height: 80%;
   border: 1px solid #d9d9d9;
 `;
 
