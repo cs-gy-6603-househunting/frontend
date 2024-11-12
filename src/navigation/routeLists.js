@@ -23,7 +23,7 @@ export const routeLists = [
     path: AllNavigation.ROOT,
   },
   {
-    key: 'add-property',
+    key: 'property',
     component: AllPages.AddProperty,
     path: AllNavigation.ADD_PROPERTY,
   },

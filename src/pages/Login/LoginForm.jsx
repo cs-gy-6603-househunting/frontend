@@ -23,14 +23,15 @@ const LoginForm = () => {
         email: values.email.trim(),
         password: values.password,
       }
-      //   const res = await authenticateUser(requestObj);
-      const res = MOCK_USER_LOGIN
+      const res = await authenticateUser(requestObj)
+      // const res = MOCK_USER_LOGIN
 
       if (res) {
+        console.log(res)
         const token = res.token
         const refreshToken = res.refreshToken
-        const user = res.user
-        dispatch(saveUserInfo({ token, refreshToken, user }))
+        const user = { role: 1 }
+        dispatch(saveUserInfo({ token, refreshToken }))
         login({
           token: token,
           refreshToken: refreshToken,

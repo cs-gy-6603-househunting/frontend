@@ -21,6 +21,11 @@ import {
 } from 'antd'
 
 import { PlusOutlined, PictureOutlined } from '@ant-design/icons'
+
+import { Formik, Field, ErrorMessage, useFormik } from 'formik'
+import * as Yup from 'yup'
+import { useEffect } from 'react'
+import propertiesService from 'src/apis/propertiesService'
 import { ScrollablePageContent } from 'src/global-styles/utils'
 
 const { Header, Content, Footer } = Layout
@@ -66,7 +71,7 @@ const AddProperty = () => {
   const addPropertyModalDescription = `We're here to make listing your property easy and flexible. You can complete the forms in any order you prefer. Each form covers a key section. Make sure to save a form when you've filled it. Once you've filled out and saved a form, you can always go back and edit it as long as the listing hasn't been submitted. After completing all sections, review your listing and submit it for verification. Once our team verifies it, your property will go live on the Listings page, and you'll be notified!`
 
   const [addProperyModalCurrentStep, setAddProperyModalCurrentStep] =
-    useState(2)
+    useState(0)
 
   const steps = [
     {
@@ -88,10 +93,6 @@ const AddProperty = () => {
   ]
 
   const items = steps.map((item) => ({ key: item.title, title: item.title }))
-
-  const onFinish = (values) => {
-    console.log('Form values:', values)
-  }
 
   const amenities_list = [
     {
@@ -132,8 +133,107 @@ const AddProperty = () => {
     },
   ]
 
+  const property_types = [
+    {
+      label: 'Apartment',
+      value: 'apartment',
+    },
+    {
+      label: 'House',
+      value: 'house',
+    },
+    {
+      label: 'Condo',
+      value: 'condo',
+    },
+  ]
+
+  const bedroom_list = [
+    {
+      label: '1',
+      value: '1',
+    },
+    {
+      label: '2',
+      value: '2',
+    },
+    {
+      label: '3',
+      value: '3',
+    },
+
+    {
+      label: '4',
+      value: '4',
+    },
+    {
+      label: '5',
+      value: '5',
+    },
+  ]
+
+  const bathroom_list = [
+    {
+      label: '1',
+      value: '1',
+    },
+    {
+      label: '2',
+      value: '2',
+    },
+    {
+      label: '3',
+      value: '3',
+    },
+
+    {
+      label: '4',
+      value: '4',
+    },
+    {
+      label: '5',
+      value: '5',
+    },
+  ]
+
   const onAvailableDateChange = (date, dateString) => {
     console.log(date, dateString)
+  }
+
+  const formik = useFormik({
+    initialValues: {
+      title: '',
+      street_address: '',
+      city: '',
+      state: '',
+      zipCode: '',
+      property_type: '',
+      bedrooms: '',
+      bathrooms: '',
+      description: '',
+      amenities: [],
+      media: '',
+      available_date: '',
+      guarantor_required: '',
+      miscellaneous_text: '',
+    },
+    validationSchema: Yup.object({
+      title: Yup.string().required('Required'),
+    }),
+    onSubmit: (values) => {
+      console.log('Form values:', values)
+      propertiesService.listPropertyApi(values).then((response) => {
+        console.log('Response:', response)
+      })
+    },
+  })
+
+  useEffect(() => {
+    console.log(formik.values)
+  }, [formik.values])
+
+  const onFinish = (values) => {
+    console.log('Form values:', values)
   }
 
   return (
@@ -148,16 +248,27 @@ const AddProperty = () => {
         centered
         footer={[
           addProperyModalCurrentStep !== 0 ? (
-            <Button key="back">{`Previous`}</Button>
+            <Button
+              key="back"
+              onClick={() => {
+                setAddProperyModalCurrentStep(addProperyModalCurrentStep - 1)
+              }}
+            >{`Previous`}</Button>
           ) : (
             <></>
           ),
           addProperyModalCurrentStep === 3 ? (
-            <Button key="next" type="primary">
+            <Button key="next" type="primary" onClick={formik.handleSubmit}>
               {`Submit`}
             </Button>
           ) : (
-            <Button key="next" type="primary">
+            <Button
+              key="next"
+              type="primary"
+              onClick={() => {
+                setAddProperyModalCurrentStep(addProperyModalCurrentStep + 1)
+              }}
+            >
               {`Next`}
             </Button>
           ),
@@ -191,12 +302,17 @@ const AddProperty = () => {
                       { required: true, message: 'Please enter a title' },
                     ]}
                   >
-                    <Input placeholder="Title" />
+                    <Input
+                      placeholder="Title"
+                      value={formik.values.title}
+                      onChange={formik.handleChange}
+                    />
                   </Form.Item>
 
                   {/* Location Fields */}
                   <Form.Item
                     label="Location"
+                    name="location"
                     rules={[
                       {
                         required: true,
@@ -206,8 +322,12 @@ const AddProperty = () => {
                   >
                     <Row gutter={16}>
                       <Col span={24}>
-                        <Form.Item name="streetAddress" noStyle>
-                          <Input placeholder="Street Address" />
+                        <Form.Item name="street_address" noStyle>
+                          <Input
+                            placeholder="Street Address"
+                            value={formik.values.street_address}
+                            onChange={formik.handleChange}
+                          />
                         </Form.Item>
                       </Col>
                     </Row>
@@ -215,17 +335,29 @@ const AddProperty = () => {
                     <Row gutter={16}>
                       <Col span={8}>
                         <Form.Item name="city" noStyle>
-                          <Input placeholder="City" />
+                          <Input
+                            placeholder="City"
+                            value={formik.values.city}
+                            onChange={formik.handleChange}
+                          />
                         </Form.Item>
                       </Col>
                       <Col span={8}>
                         <Form.Item name="state" noStyle>
-                          <Input placeholder="State" />
+                          <Input
+                            placeholder="State"
+                            value={formik.values.state}
+                            onChange={formik.handleChange}
+                          />
                         </Form.Item>
                       </Col>
                       <Col span={8}>
                         <Form.Item name="zipCode" noStyle>
-                          <Input placeholder="Zip Code" />
+                          <Input
+                            placeholder="Zip Code"
+                            value={formik.values.zipCode}
+                            onChange={formik.handleChange}
+                          />
                         </Form.Item>
                       </Col>
                     </Row>
@@ -235,8 +367,8 @@ const AddProperty = () => {
                   <Row gutter={16}>
                     <Col span={8}>
                       <Form.Item
-                        label="Type"
-                        name="type"
+                        label="Property Type"
+                        name="property_type"
                         rules={[
                           {
                             required: true,
@@ -244,10 +376,21 @@ const AddProperty = () => {
                           },
                         ]}
                       >
-                        <Select placeholder="Select type of property">
-                          <Option value="apartment">Apartment</Option>
-                          <Option value="house">House</Option>
-                          <Option value="condo">Condo</Option>
+                        <Select
+                          placeholder="Select type of property"
+                          value={formik.values.property_type}
+                          onChange={(e) => {
+                            formik.setFieldValue('property_type', e)
+                          }}
+                        >
+                          {property_types.map((property_type) => (
+                            <Option
+                              key={property_type?.value}
+                              value={property_type?.value}
+                            >
+                              {property_type?.label}
+                            </Option>
+                          ))}
                         </Select>
                       </Form.Item>
                     </Col>
@@ -262,12 +405,18 @@ const AddProperty = () => {
                           },
                         ]}
                       >
-                        <Select placeholder="Select number of bedrooms">
-                          <Option value="1">1</Option>
-                          <Option value="2">2</Option>
-                          <Option value="3">3</Option>
-                          <Option value="4">4</Option>
-                          <Option value="5">5</Option>
+                        <Select
+                          placeholder="Select number of bedrooms"
+                          value={formik.values.bedrooms}
+                          onChange={(e) => {
+                            formik.setFieldValue('bedrooms', e)
+                          }}
+                        >
+                          {bedroom_list.map((bedroom) => (
+                            <Option key={bedroom?.value} value={bedroom?.value}>
+                              {bedroom?.label}
+                            </Option>
+                          ))}
                         </Select>
                       </Form.Item>
                     </Col>
@@ -282,12 +431,21 @@ const AddProperty = () => {
                           },
                         ]}
                       >
-                        <Select placeholder="Select number of bathrooms">
-                          <Option value="1">1</Option>
-                          <Option value="2">2</Option>
-                          <Option value="3">3</Option>
-                          <Option value="4">4</Option>
-                          <Option value="5">5</Option>
+                        <Select
+                          placeholder="Select number of bathrooms"
+                          value={formik.values.bathrooms}
+                          onChange={(e) => {
+                            formik.setFieldValue('bathrooms', e)
+                          }}
+                        >
+                          {bathroom_list.map((bathroom) => (
+                            <Option
+                              key={bathroom?.value}
+                              value={bathroom?.value}
+                            >
+                              {bathroom?.label}
+                            </Option>
+                          ))}
                         </Select>
                       </Form.Item>
                     </Col>
@@ -307,6 +465,8 @@ const AddProperty = () => {
                       rows={4}
                       placeholder="Describe the property, unique features, nearby attractions, etc."
                       maxLength={255}
+                      onChange={formik.handleChange}
+                      value={formik.values.description}
                     />
                   </Form.Item>
 
@@ -315,7 +475,10 @@ const AddProperty = () => {
                       <Row gutter={16}>
                         {amenities_list.map((amenity) => (
                           <Col span={8}>
-                            <Checkbox value={amenity?.value}>
+                            <Checkbox
+                              key={amenity?.value}
+                              value={amenity?.value}
+                            >
                               {amenity?.label}
                             </Checkbox>
                           </Col>
@@ -355,7 +518,9 @@ const AddProperty = () => {
                         ]}
                       >
                         <DatePicker
-                          onChange={onAvailableDateChange}
+                          onChange={(date, dateString) => {
+                            formik.setFieldValue('available_date', dateString)
+                          }}
                           style={{ minWidth: '80%' }}
                         />
                       </Form.Item>
@@ -383,6 +548,9 @@ const AddProperty = () => {
                               label: 'No',
                             },
                           ]}
+                          onChange={(e) => {
+                            formik.setFieldValue('guarantor_required', e)
+                          }}
                         />
                       </Form.Item>
                     </Col>
@@ -393,7 +561,13 @@ const AddProperty = () => {
                         label="Any terms/conditions/additional notes?"
                         name="miscellaneous_text"
                       >
-                        <TextArea rows={4} placeholder="" maxLength={255} />
+                        <TextArea
+                          rows={4}
+                          placeholder=""
+                          maxLength={255}
+                          value={formik.values.miscellaneous_text}
+                          onChange={formik.handleChange}
+                        />
                       </Form.Item>
                     </Col>
                   </Row>
