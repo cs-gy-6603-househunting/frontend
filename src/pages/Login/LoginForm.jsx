@@ -32,8 +32,8 @@ const LoginForm = () => {
 
       if (res && res.error && res.error === 'Email Unverified') {
         setShowVerifyDialog(true)
-      } else if (res && res.accessToken) {
-        const token = res.accessToken
+      } else if (res && res.token) {
+        const token = res.token
         const refreshToken = res.refreshToken
         const user = { role: 1 }
         dispatch(saveUserInfo({ token, refreshToken }))
