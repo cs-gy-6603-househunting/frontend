@@ -35,8 +35,9 @@ const LoginForm = () => {
       } else if (res && res.token) {
         const token = res.token
         const refreshToken = res.refreshToken
-        const user = { role: 1 }
-        dispatch(saveUserInfo({ token, refreshToken }))
+        const user = res.user
+
+        dispatch(saveUserInfo({ user, token, refreshToken }))
         login({
           token: token,
           refreshToken: refreshToken,

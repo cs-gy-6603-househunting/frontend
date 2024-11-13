@@ -23,6 +23,11 @@ export const routeLists = [
     path: AllNavigation.ROOT,
   },
   {
+    key: 'home',
+    component: AllPages.Dashboard,
+    path: AllNavigation.HOME,
+  },
+  {
     key: 'property',
     component: AllPages.AddProperty,
     path: AllNavigation.ADD_PROPERTY,

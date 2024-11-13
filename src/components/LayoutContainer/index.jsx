@@ -1,12 +1,27 @@
-import { Layout, Menu, Dropdown, Button } from 'antd'
+import { Layout, Menu } from 'antd'
 import { Route, Routes, useNavigate } from 'react-router-dom'
 import { routeLists } from 'src/navigation/routeLists'
 import { UserOutlined } from '@ant-design/icons'
+import { ProfileContainer, ProfileInfoContainer } from './styles'
+import { Popover } from 'antd'
+import { useSelector } from 'react-redux'
+import { CTAS } from 'src/global-styles/utils'
+import { useAuth } from '../AuthProvider'
+import { clearAuthOnLogout } from 'src/utils/storage'
+import Profile from '../Modals/Profile'
+import { useState } from 'react'
 
 const { Header, Content, Footer } = Layout
 
 const LayoutContainer = () => {
   const navigate = useNavigate()
+
+  const [isProfileOpen, setProfileOpen] = useState(false)
+  const [isPopOverMenuOpen, setPopOverOpen] = useState(false)
+
+  const user = useSelector((state) => state.auth.user)
+
+  const { logout } = useAuth()
 
   const handleMenuClick = (e) => {
     console.log(e)
@@ -14,26 +29,34 @@ const LayoutContainer = () => {
   }
 
   const handleSignOut = () => {
-    // Add sign-out logic here
-    console.log('Signed out')
+    clearAuthOnLogout()
+    logout()
   }
 
   const profileMenu = (
-    <Menu>
-      <Menu.Item key="profile">
-        <div>
-          <strong>Name:</strong> John Doe
-        </div>
-        <div>
-          <strong>Email:</strong> john.doe@example.com
-        </div>
+    <Menu mode="vertical" selectable={false}>
+      <Menu.Item
+        key="profile"
+        onClick={() => {
+          setProfileOpen(true)
+          setPopOverOpen(false)
+        }}
+      >
+        Profile
       </Menu.Item>
-      <Menu.Divider />
       <Menu.Item key="signout" onClick={handleSignOut}>
         Sign Out
       </Menu.Item>
     </Menu>
   )
+
+  const onProfileClose = () => {
+    setProfileOpen(false)
+  }
+
+  const handlePopOverOpenChange = (newOpen) => {
+    setPopOverOpen(newOpen)
+  }
 
   return (
     <Layout style={{ minHeight: '100vh' }}>
@@ -71,11 +94,19 @@ const LayoutContainer = () => {
           <Menu.Item key="about">{`About Us`}</Menu.Item>
           <Menu.Item key="contact">{`Contact`}</Menu.Item>
         </Menu>
-        <Dropdown menu={profileMenu} trigger={['click']}>
-          <Button type="text" icon={<UserOutlined />} style={{ color: '#fff' }}>
-            {`Profile`}
-          </Button>
-        </Dropdown>
+        <ProfileContainer>
+          <Popover
+            trigger={'click'}
+            content={profileMenu}
+            open={isPopOverMenuOpen}
+            onOpenChange={handlePopOverOpenChange}
+          >
+            <ProfileInfoContainer>
+              <UserOutlined style={CTAS} />
+              {`${user.email}`}
+            </ProfileInfoContainer>
+          </Popover>
+        </ProfileContainer>
       </Header>
 
       {/* Main Content */}
@@ -91,6 +122,8 @@ const LayoutContainer = () => {
       <Footer style={{ textAlign: 'center' }}>
         {`RoomScout © 2024. Made with ❤️ in Brooklyn.`}
       </Footer>
+
+      <Profile isProfileOpen={isProfileOpen} onClose={onProfileClose} />
     </Layout>
   )
 }
