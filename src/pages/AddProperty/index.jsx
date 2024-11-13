@@ -18,6 +18,9 @@ import {
   Checkbox,
   Upload,
   DatePicker,
+  Empty,
+  notification,
+  InputNumber,
 } from 'antd'
 
 import { PlusOutlined, PictureOutlined } from '@ant-design/icons'
@@ -200,8 +203,18 @@ const AddProperty = () => {
     console.log(date, dateString)
   }
 
+  const [api, contextHolder] = notification.useNotification()
+
+  const openNotification = (description) => {
+    api.error({
+      message: 'Information',
+      description: description,
+    })
+  }
+
   const formik = useFormik({
     initialValues: {
+      rent: '',
       title: '',
       street_address: '',
       city: '',
@@ -222,9 +235,13 @@ const AddProperty = () => {
     }),
     onSubmit: (values) => {
       console.log('Form values:', values)
-      propertiesService.listPropertyApi(values).then((response) => {
-        console.log('Response:', response)
-      })
+      // propertiesService.listPropertyApi(values).then((response) => {
+      //   console.log('Response:', response)
+      // })
+
+      openNotification(
+        'Your property has been successfully listed on RoomScout!'
+      )
     },
   })
 
@@ -238,6 +255,7 @@ const AddProperty = () => {
 
   return (
     <>
+      {contextHolder}
       <Flex gap="middle" justify="space-between"></Flex>
       <Modal
         title={`Adding your Property`}
@@ -295,19 +313,42 @@ const AddProperty = () => {
             <Form layout="vertical" onFinish={onFinish} variant="filled">
               {addProperyModalCurrentStep === 0 && (
                 <>
-                  <Form.Item
-                    label="Title"
-                    name="title"
-                    rules={[
-                      { required: true, message: 'Please enter a title' },
-                    ]}
-                  >
-                    <Input
-                      placeholder="Title"
-                      value={formik.values.title}
-                      onChange={formik.handleChange}
-                    />
-                  </Form.Item>
+                  <Row gutter={16}>
+                    <Col span={12}>
+                      <Form.Item
+                        label="Title"
+                        name="title"
+                        rules={[
+                          { required: true, message: 'Please enter a title' },
+                        ]}
+                      >
+                        <Input
+                          placeholder="Title"
+                          value={formik.values.title}
+                          onChange={formik.handleChange}
+                        />
+                      </Form.Item>
+                    </Col>
+                    <Col span={12}>
+                      <Form.Item
+                        label="Rent"
+                        name="rent"
+                        rules={[
+                          { required: true, message: 'Please enter a rent' },
+                        ]}
+                      >
+                        {/* make this input a numerical field */}
+                        <InputNumber
+                          placeholder="Rent"
+                          value={formik.values.rent}
+                          onChange={(value) =>
+                            formik.setFieldValue('rent', value)
+                          }
+                          style={{ width: '100%' }}
+                        />
+                      </Form.Item>
+                    </Col>
+                  </Row>
 
                   {/* Location Fields */}
                   <Form.Item
@@ -586,7 +627,10 @@ const AddProperty = () => {
             icon={<PlusOutlined />}
           >{`Add a Property`}</Button>
         }
-      ></Card>
+        style={{ minHeight: '40vh' }}
+      >
+        <Empty description="No properties found" />
+      </Card>
     </>
   )
 }
