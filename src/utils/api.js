@@ -7,6 +7,8 @@ import {
   getLocalStorageData,
   setLocalStorageData,
 } from './storage'
+import { CUSTOM_STATUS } from './enum'
+import { App } from 'antd'
 
 const isAuthRequired = (url) => !AUTH_NOT_REQUIRED_APIS.includes(url)
 
@@ -41,11 +43,10 @@ const handleRefreshToken = async () => {
 }
 
 const handleUnauthorizedAccess = (err) => {
-  if (
-    err.response.data &&
-    (err.response.data.status === 500 || err.response.data.status === 501)
-  ) {
-    //show error
+  const data = err.response.data
+
+  if (data && data.error && data.error.status) {
+    return data
   } else {
     clearAuthOnLogout()
     window.location.href = LOGIN
@@ -91,11 +92,11 @@ api.interceptors.response.use(
         await handleRefreshToken()
         return api(originalRequest)
       } else if (err.response.status && err.response.status === 401) {
-        handleUnauthorizedAccess(err)
+        return handleUnauthorizedAccess(err)
       } else if (err.response.status && err.response.status === 403) {
         return handleForbiddenAccess(err)
       } else if (err.response.status && err.response.status === 400) {
-        return {error: err.response.data}
+        return err.response.data
       } else {
         //open notification
       }

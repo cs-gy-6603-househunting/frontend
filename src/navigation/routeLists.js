@@ -14,6 +14,11 @@ export const openRouteList = [
     path: AllNavigation.NEW_ACCOUNT,
     props: { newAccount: true },
   },
+  {
+    key: 'verify-email',
+    component: AllPages.VerfiyEmail,
+    path: AllNavigation.VERIFY_EMAIL,
+  },
 ]
 
 export const routeLists = [

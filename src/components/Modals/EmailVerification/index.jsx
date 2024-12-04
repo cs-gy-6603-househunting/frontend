@@ -20,7 +20,10 @@ const EmailVerification = ({
 
       const res = await verfiyEmail(requestObj)
 
-      console.log(res)
+      if (res) {
+        onClose()()
+        console.log(res)
+      }
     })
   }
 

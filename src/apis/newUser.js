@@ -8,3 +8,7 @@ export const registerUser = async (requestObj) => {
 export const verfiyEmail = async (requestObj) => {
   return await api.post(API_URLS.verify_email_api, requestObj)
 }
+
+export const requestNewVerifyLink = async (requestObj) => {
+  return await api.post(API_URLS.request_new_verify_link, requestObj)
+}

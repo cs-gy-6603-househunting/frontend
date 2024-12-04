@@ -13,13 +13,15 @@ import { useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 import { verificationCodeValidation } from 'src/utils/regex'
 import EmailVerification from 'src/components/Modals/EmailVerification'
+import { CUSTOM_STATUS } from 'src/utils/enum'
+import { App } from 'antd'
 
 const LoginForm = () => {
   const [form] = useForm()
-  const [showVerifyDialog, setShowVerifyDialog] = useState(false)
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const { login } = useAuth()
+  const { notification } = App.useApp()
 
   const onFinish = () => {
     form.validateFields().then(async (values) => {
@@ -28,10 +30,14 @@ const LoginForm = () => {
         password: values.password,
       }
       const res = await authenticateUser(requestObj)
-      // const res = MOCK_USER_LOGIN
 
-      if (res && res.error && res.error === 'Email Unverified') {
-        setShowVerifyDialog(true)
+      if (res && res.error) {
+        const error = res.error
+        if (CUSTOM_STATUS.INVALID_EMAIL_PASSWORD === error.status)
+          notification.error({
+            message: 'Login Failed',
+            description: error.message,
+          })
       } else if (res && res.token) {
         const token = res.token
         const refreshToken = res.refreshToken
@@ -46,10 +52,6 @@ const LoginForm = () => {
         navigate('/')
       }
     })
-  }
-
-  const onVerificationDialogClose = () => () => {
-    setShowVerifyDialog(false)
   }
 
   return (
@@ -84,10 +86,6 @@ const LoginForm = () => {
           </FlexEnd>
         </Form.Item>
       </Form>
-      <EmailVerification
-        showVerificationDialog={showVerifyDialog}
-        onClose={onVerificationDialogClose}
-      />
     </>
   )
 }
