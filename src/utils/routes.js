@@ -1,3 +1,6 @@
-export const ROOT = "/";
-export const LOGIN = "/login";
-export const NEW_ACCOUNT = "/register";
+export const ROOT = '/'
+export const HOME = '/home'
+export const LOGIN = '/login'
+export const NEW_ACCOUNT = '/register'
+export const ADD_PROPERTY = '/properties'
+export const VERIFY_EMAIL = '/verify-email'
