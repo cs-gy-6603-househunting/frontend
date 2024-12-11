@@ -1,11 +1,11 @@
 {
   "name": "househunt-ui",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "VITE_APP_BASE_URL=https://room-scout-be-3ca1661c03e0.herokuapp.com/ vite build",
     "lint": "eslint .",
     "preview": "vite preview",
     "serve": "serve -s dist"
