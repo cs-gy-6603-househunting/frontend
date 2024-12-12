@@ -21,6 +21,11 @@ import {
   Empty,
   notification,
   InputNumber,
+  List,
+  Tag,
+  Carousel,
+  Divider,
+  Tooltip,
 } from 'antd'
 
 import Icon, {
@@ -29,6 +34,11 @@ import Icon, {
   LoadingOutlined,
   ReloadOutlined,
   EditOutlined,
+  DeleteOutlined,
+  ExclamationCircleOutlined, 
+  CheckCircleOutlined, 
+  CloseCircleOutlined,
+  SyncOutlined 
 } from '@ant-design/icons'
 
 import { Formik, Field, ErrorMessage, useFormik } from 'formik'
@@ -40,33 +50,18 @@ import { useForm } from 'antd/es/form/Form'
 import dayjs from 'dayjs'
 import { App } from 'antd'
 import { Spin } from 'antd'
+import '../../index.css';
 
 const { Header, Content, Footer } = Layout
-const { Title } = Typography
+const { Title, Text } = Typography
 const { Option } = Select
 const { Search, TextArea } = Input
 const { Dragger } = Upload
 
-const properties = [
-  {
-    id: 1,
-    title: 'Cozy Apartment in City Center',
-    price: 1200,
-    image: 'https://via.placeholder.com/300x200',
-  },
-  {
-    id: 2,
-    title: 'Modern Studio in Suburb',
-    price: 900,
-    image: 'https://via.placeholder.com/300x200',
-  },
-  {
-    id: 3,
-    title: 'Spacious House Near Park',
-    price: 1500,
-    image: 'https://via.placeholder.com/300x200',
-  },
-]
+export const STATUS_VERIFICATION_PROPERTY_NOT_SUBMITTED = 0;
+export const STATUS_VERIFICATION_PROPERTY_SUBMITTED = 1;
+export const STATUS_VERIFICATION_PROPERTY_DENIED = 2;
+export const STATUS_VERIFICATION_PROPERTY_VERIFIED = 3;
 
 const AddProperty = () => {
   const [isAddPropertyModalOpen, setIsAddPropertyModalOpen] = useState(false)
@@ -204,8 +199,45 @@ const AddProperty = () => {
   const { notification } = App.useApp()
   const [isLoading, setLoading] = useState(false)
   const [propertyListing, setPropertyListing] = useState([])
-  const [initialValues, setInitailValues] = useState(null)
+  const [initialValues, setInitialValues] = useState(null)
   const [isEdit, setIdEdit] = useState(false)
+
+  const getStatusTag = (status) => {
+    const tagStyle = {
+      fontSize: '14px', // Increase font size
+      fontWeight: 'bold', // Optional for better visibility
+      padding: '5px 10px', // Adjust padding for better appearance
+      borderRadius: '5px', // Rounded corners for a modern look
+    };
+    switch (status) {
+      case STATUS_VERIFICATION_PROPERTY_NOT_SUBMITTED:
+        return (
+          <Tag color="orange" icon={<ExclamationCircleOutlined />} style={tagStyle}>
+            Not Submitted for Verification
+          </Tag>
+        );
+      case STATUS_VERIFICATION_PROPERTY_SUBMITTED:
+        return (
+          <Tag color="blue" icon={<SyncOutlined />} style={tagStyle}>
+            Submitted for Verification
+          </Tag>
+        );
+      case STATUS_VERIFICATION_PROPERTY_DENIED:
+        return (
+          <Tag color="red" icon={<CloseCircleOutlined />} style={tagStyle}>
+            Verification Denied
+          </Tag>
+        );
+      case STATUS_VERIFICATION_PROPERTY_VERIFIED:
+        return (
+          <Tag color="green" icon={<CheckCircleOutlined />} style={tagStyle}>
+            Verified
+          </Tag>
+        );
+      default:
+        return null;
+    }
+  };
 
   const handleAddPropertyModalOpen = (isEdit, initialValues) => {
     setIdEdit(isEdit)
@@ -233,6 +265,7 @@ const AddProperty = () => {
   }
 
   useEffect(() => {
+    console.log('a')
     getPropertyListings()
   }, [])
 
@@ -300,10 +333,10 @@ const AddProperty = () => {
             'deleted_images',
             JSON.stringify(filesToDelete.map((file) => file.uid))
           )
-          const uploadRes = await propertiesService.propertyUploadImage(
-            formData
-          )
-          if (uploadRes.success) {
+          // const uploadRes = await propertiesService.propertyUploadImage(
+          //   formData
+          // )
+          // if (uploadRes.success) {
             notification.success({
               message: 'Property Updated',
               description: 'Successfully updated property to listing',
@@ -311,7 +344,7 @@ const AddProperty = () => {
             form.resetFields()
             handleAddPropertyModalClose()
             setAddProperyModalCurrentStep(0)
-          }
+          // }
         }
         setLoading(false)
       } else {
@@ -328,10 +361,10 @@ const AddProperty = () => {
             'deleted_images',
             JSON.stringify(filesToDelete.map((file) => file.url))
           )
-          const uploadRes = await propertiesService.propertyUploadImage(
-            formData
-          )
-          if (uploadRes.success) {
+          // const uploadRes = await propertiesService.propertyUploadImage(
+          //   formData
+          // )
+          // if (uploadRes.success) {
             notification.success({
               message: 'Property Added',
               description: 'Successfully added property to listing',
@@ -339,7 +372,7 @@ const AddProperty = () => {
             form.resetFields()
             handleAddPropertyModalClose()
             setAddProperyModalCurrentStep(0)
-          }
+          // }
         }
         setLoading(false)
       }
@@ -353,7 +386,42 @@ const AddProperty = () => {
     })
   }
 
+  const handleSubmitForVerification = async (propertyId) => {
+    try {
+      if (!propertyId) {
+        throw new Error('Property ID is required');
+      }
+
+      console.log('Submitting property for verification:', propertyId);
+      const response = await propertiesService.submitPropertyForVerification(propertyId);
+      
+      if (!response) {
+        throw new Error('No response received from server');
+      }
+
+      if (response.success) {
+        notification.success({
+          message: 'Success',
+          description: response.message,
+        });
+        // Refresh property list or perform other UI updates
+      } else {
+        notification.error({
+          message: 'Error',
+          description: response.error || 'Failed to submit property for verification',
+        });
+      }
+    } catch (error) {
+      console.error('Verification submission error:', error);
+      notification.error({
+        message: 'Error',
+        description: error.message || 'An unexpected error occurred during verification submission',
+      });
+    }
+};
+
   return (
+    <div > 
     <>
       <Flex gap="middle" justify="space-between"></Flex>
       <Modal
@@ -371,17 +439,22 @@ const AddProperty = () => {
               onClick={() => {
                 setAddProperyModalCurrentStep(addProperyModalCurrentStep - 1)
               }}
+              htmlType="submit"
+              className="button"
             >{`Previous`}</Button>
           ) : (
             <></>
           ),
           addProperyModalCurrentStep === 3 ? (
-            <Button key="next" type="primary" onClick={onFinish}>
+            <Button key="next" type="primary" onClick={onFinish} htmlType="submit"
+            className="button">
               {isEdit ? 'Update' : `Save`}
             </Button>
           ) : (
             <Button
               key="next"
+              htmlType="submit"
+              className="button"
               type="primary"
               onClick={() => {
                 validateFields()
@@ -424,7 +497,12 @@ const AddProperty = () => {
                           ]}
                           initialValue={isEdit ? initialValues.title : ''}
                         >
-                          <Input placeholder="Title" />
+                          <Input
+                            placeholder="Title"
+                            disabled={
+                              isEdit && initialValues.status_verification === STATUS_VERIFICATION_PROPERTY_VERIFIED
+                            }
+                          />
                         </Form.Item>
                       </Col>
                       <Col span={12}>
@@ -460,8 +538,16 @@ const AddProperty = () => {
                           initialValue={
                             isEdit ? initialValues.address.street_address : ''
                           }
+                          disabled={
+                            isEdit && initialValues.status_verification === STATUS_VERIFICATION_PROPERTY_VERIFIED
+                          }
                         >
-                          <Input placeholder="Street Address" />
+                          <Input 
+                            placeholder="Street Address" 
+                            disabled={
+                              isEdit && initialValues.status_verification === STATUS_VERIFICATION_PROPERTY_VERIFIED
+                              }
+                          />
                         </Form.Item>
                       </Col>
                     </Row>
@@ -480,7 +566,9 @@ const AddProperty = () => {
                             isEdit ? initialValues.address.city : ''
                           }
                         >
-                          <Input placeholder="City" />
+                          <Input placeholder="City" disabled={
+                            isEdit && initialValues.status_verification === STATUS_VERIFICATION_PROPERTY_VERIFIED
+                          }/>
                         </Form.Item>
                       </Col>
                       <Col span={8}>
@@ -496,7 +584,9 @@ const AddProperty = () => {
                             isEdit ? initialValues.address.state : ''
                           }
                         >
-                          <Input placeholder="State" />
+                          <Input placeholder="State" disabled={
+                            isEdit && initialValues.status_verification === STATUS_VERIFICATION_PROPERTY_VERIFIED
+                          }/>
                         </Form.Item>
                       </Col>
                       <Col span={8}>
@@ -512,7 +602,10 @@ const AddProperty = () => {
                             isEdit ? initialValues.address.zip_code : ''
                           }
                         >
-                          <Input placeholder="Zip Code" />
+                          <Input placeholder="Zip Code" 
+                          disabled={
+                            isEdit && initialValues.status_verification === STATUS_VERIFICATION_PROPERTY_VERIFIED
+                          }/>
                         </Form.Item>
                       </Col>
                     </Row>
@@ -533,7 +626,10 @@ const AddProperty = () => {
                             isEdit ? initialValues.details.property_type : ''
                           }
                         >
-                          <Select placeholder="Select type of property">
+                          <Select placeholder="Select type of property"
+                          disabled={
+                            isEdit && initialValues.status_verification === STATUS_VERIFICATION_PROPERTY_VERIFIED
+                          }>
                             {property_types.map((property_type) => (
                               <Option
                                 key={property_type?.value}
@@ -559,7 +655,10 @@ const AddProperty = () => {
                             isEdit ? initialValues.details.bedrooms : ''
                           }
                         >
-                          <Select placeholder="Select number of bedrooms">
+                          <Select placeholder="Select number of bedrooms" 
+                          disabled={
+                              isEdit && initialValues.status_verification === STATUS_VERIFICATION_PROPERTY_VERIFIED
+                            }>
                             {bedroom_list.map((bedroom) => (
                               <Option
                                 key={bedroom?.value}
@@ -585,7 +684,12 @@ const AddProperty = () => {
                             isEdit ? initialValues.details.bathrooms : ''
                           }
                         >
-                          <Select placeholder="Select number of bathrooms">
+                          <Select 
+                            placeholder="Select number of bathrooms"
+                            disabled={
+                              isEdit && initialValues.status_verification === STATUS_VERIFICATION_PROPERTY_VERIFIED
+                            }
+                          >
                             {bathroom_list.map((bathroom) => (
                               <Option
                                 key={bathroom?.value}
@@ -749,43 +853,199 @@ const AddProperty = () => {
           </ScrollablePageContent>
         </Spin>
       </Modal>
-      <Card
-        title="Your Properties"
-        extra={
-          <>
-            <Button
-              icon={<ReloadOutlined />}
-              onClick={getPropertyListings}
-              style={CTAS}
-            >{`Refresh`}</Button>
-            <Button
-              type="primary"
+
+        <div width="1780px"
+        > 
+
+        <Row justify="space-between">
+          <Col>
+            <Title level={3} style={{ margin: 0, fontWeight: 'bold' }}>
+              Your Properties
+            </Title>
+          </Col>
+          <Col>
+          <Button
               onClick={() => handleAddPropertyModalOpen(false)}
               icon={<PlusOutlined />}
-            >{`Add a Property`}</Button>
-          </>
-        }
-        style={{ minHeight: '40vh' }}
-      >
+              type="primary" 
+              htmlType="submit"
+              className="button"
+          >
+              {`Add a Property`}
+          </Button>
+
+          </Col>
+        </Row>
+        </div>
+        <Divider></Divider>
+
+      {/* <Layout marginTop="10px"> */}
+      <Layout
+      style={{
+        background: 'transparent', // Make Layout background transparent
+        minHeight: '100vh', // Ensure it covers the entire viewport height
+      }}
+    >
+        
         {propertyListing.length === 0 && (
           <Empty description="No properties found" />
         )}
         {propertyListing.length !== 0 &&
-          propertyListing.map((item) => {
-            return (
-              <>
-                <div style={CTAS}>{item.title}</div>
-                <EditOutlined
-                  onClick={() => {
-                    setInitailValues(item)
-                    handleAddPropertyModalOpen(true, item)
-                  }}
-                />
-              </>
-            )
-          })}
-      </Card>
+        propertyListing.map((item) => {
+        return (
+          <>
+            <Row gutter={[20, 20]}>
+            <Col span={30}>
+              <List grid={{ gutter: 20, column: 1 }}>
+                <List.Item>
+                  <div class="glass" width="1780px">
+                  {/* <Card
+                    hoverable
+                    style={{
+                      background: "#ffffff",
+                      border: "1px solid #e0e0e0",
+                      borderRadius: "8px",
+                      boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.05)",
+                      padding: "5px",
+                      width: "1740px",
+                    }}
+                  > */}
+                    <div style={{ flex: 1, padding: "5px", display: "flex", width: "100%" }}>
+                      {/* Property Image */}
+                      {/* <div style={{ padding: "0", margin: "0" }}> */}
+                      {/* Property Image Carousel */}
+                      <Carousel
+                        arrows={true}
+                        style={{
+                          width: "450px",
+                          height: "300px",
+                          padding: "0"
+                        }}
+                      >
+                        {item.images && item.images.length > 0 ? (
+                          item.images.map((image, index) => (
+                            <div key={index}>
+                              <img
+                                src={image.url}
+                                alt={`Property image ${index + 1}`}
+                                style={{
+                                  width: "450px",
+                                  height: "300px",
+                                  objectFit: "cover", // Ensures the image scales nicely
+                                }}
+                              />
+                            </div>
+                          ))
+                        ) : (
+                          <div>
+                            <img
+                              src="https://via.placeholder.com/300x200"
+                              alt="Placeholder"
+                              style={{
+                                width: "450px",
+                                height: "300px",
+                              }}
+                            />
+                          </div>
+                        )}
+                      </Carousel>
+                      {/* Property Details */}
+                      <div style={{ flex: 1, marginLeft: "20px" }} >
+                      <div style={{ display: "flex", justifyContent: "space-between" }}>
+                        {/* Rent and Title */}
+                        <Text strong style={{ fontSize: "24px" }}>
+                          ${item.rent}/month 
+                        </Text>
+
+                        <div style={{ display: "flex", justifyContent: "space-between" }}></div>
+
+                        {getStatusTag(item.status_verification)}
+                        
+                        </div>
+                        
+
+                        {/* Address */}
+                        <div style={{ marginTop: "10px" }}>
+                          <Text style={{ fontSize: "15px", display: "block" }}>
+                            {item.title} 📍 {item.address.street_address}, {item.address.city}, {item.address.state}, {item.address.zip_code}
+                          </Text>
+                        </div>
+
+                        {/* Bedrooms and Bathrooms */}
+                        <div style={{ marginTop: "10px" }}>
+                          <Text style={{ fontSize: "15px", display: "block" }}>
+                            🛏️ {item.details.bedrooms} bd • 🛁 {item.details.bathrooms} ba
+                          </Text>
+                        </div>
+
+                        {/* Description */}
+                        <div style={{ marginTop: "10px" }}>
+                          <Text style={{ fontSize: "15px" }}>
+                            {item.details.description || "No Description Available"}
+                          </Text>
+                        </div>
+
+                        {/* Action Buttons */}
+                        <div
+                          style={{
+                            marginTop: "15px",
+                            display: "flex",
+                            gap: "10px",
+                          }}
+                        >
+                          <Tooltip
+                            title={
+                              item.status_verification === STATUS_VERIFICATION_PROPERTY_SUBMITTED
+                                ? 'You cannot edit this property because it is submitted for verification.'
+                                : item.status_verification === STATUS_VERIFICATION_PROPERTY_VERIFIED
+                                ? 'You can only edit select fields of a verified property.'
+                                : ''
+                            }
+                          >
+                          <Button 
+                            icon={<EditOutlined />} 
+                            disabled={item.status_verification === STATUS_VERIFICATION_PROPERTY_SUBMITTED}
+                            onClick={() => {
+                              setInitialValues(item);
+                              handleAddPropertyModalOpen(true, item);
+                            }}
+                          >
+                            Edit
+                          </Button>
+                        </Tooltip>
+                          <Button
+                            icon={<DeleteOutlined />}
+                            danger
+                            onClick={() => handleRemoveClick(item)}
+                            style={{
+                              borderColor: "#ff4d4f",
+                            }}
+                          >
+                            Remove
+                          </Button>
+                          {item.status_verification === STATUS_VERIFICATION_PROPERTY_NOT_SUBMITTED && (
+                            <Button                              
+                              onClick={() => handleSubmitForVerification(item.id)}
+                            >
+                              Submit for Verification
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  {/* </Card> */}
+                  </div>
+                </List.Item>
+              </List>
+            </Col>
+          </Row>
+          </>
+        );
+      })
+    }
+      </Layout>
     </>
+    </div>
   )
 }
 
