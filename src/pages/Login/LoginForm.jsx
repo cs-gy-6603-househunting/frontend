@@ -77,7 +77,7 @@ const LoginForm = () => {
         >
           <Input.Password placeholder="Your Password" />
         </Form.Item>
-        <Link>Forgot Password?</Link>
+        {/* <Link>Forgot Password?</Link> */}
         <Form.Item>
           <FlexEnd>
             <Button type="primary" htmlType="submit">

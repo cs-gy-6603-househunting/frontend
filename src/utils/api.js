@@ -7,8 +7,6 @@ import {
   getLocalStorageData,
   setLocalStorageData,
 } from './storage'
-import { CUSTOM_STATUS } from './enum'
-import { App } from 'antd'
 
 const isAuthRequired = (url) => !AUTH_NOT_REQUIRED_APIS.includes(url)
 
@@ -98,7 +96,7 @@ api.interceptors.response.use(
       } else if (err.response.status && err.response.status === 400) {
         return err.response.data
       } else {
-        //open notification
+        return err.response.data
       }
     }
     return Promise.reject(err)

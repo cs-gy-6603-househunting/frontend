@@ -1,7 +1,5 @@
 import { useState } from 'react'
 import {
-  Layout,
-  Menu,
   Input,
   Button,
   Row,
@@ -9,17 +7,14 @@ import {
   Card,
   Form,
   Select,
-  Typography,
   Flex,
   Modal,
   Alert,
-  Progress,
   Steps,
   Checkbox,
   Upload,
   DatePicker,
   Empty,
-  notification,
   InputNumber,
 } from 'antd'
 
@@ -31,8 +26,6 @@ import Icon, {
   EditOutlined,
 } from '@ant-design/icons'
 
-import { Formik, Field, ErrorMessage, useFormik } from 'formik'
-import * as Yup from 'yup'
 import { useEffect } from 'react'
 import propertiesService from 'src/apis/propertiesService'
 import { CTAS, ScrollablePageContent } from 'src/global-styles/utils'
@@ -40,164 +33,27 @@ import { useForm } from 'antd/es/form/Form'
 import dayjs from 'dayjs'
 import { App } from 'antd'
 import { Spin } from 'antd'
+import { Image } from 'antd'
+import { range } from 'src/utils/utils'
+import {
+  addPropertyModalDescription,
+  amenitiesList,
+  propertyTypes,
+  states,
+  steps,
+} from './constants'
 
-const { Header, Content, Footer } = Layout
-const { Title } = Typography
 const { Option } = Select
-const { Search, TextArea } = Input
+const { TextArea } = Input
 const { Dragger } = Upload
-
-const properties = [
-  {
-    id: 1,
-    title: 'Cozy Apartment in City Center',
-    price: 1200,
-    image: 'https://via.placeholder.com/300x200',
-  },
-  {
-    id: 2,
-    title: 'Modern Studio in Suburb',
-    price: 900,
-    image: 'https://via.placeholder.com/300x200',
-  },
-  {
-    id: 3,
-    title: 'Spacious House Near Park',
-    price: 1500,
-    image: 'https://via.placeholder.com/300x200',
-  },
-]
 
 const AddProperty = () => {
   const [isAddPropertyModalOpen, setIsAddPropertyModalOpen] = useState(false)
 
-  const addPropertyModalDescription = `We're here to make listing your property easy and flexible. You can complete the forms in any order you prefer. Each form covers a key section. Make sure to save a form when you've filled it. Once you've filled out and saved a form, you can always go back and edit it as long as the listing hasn't been submitted. After completing all sections, review your listing and submit it for verification. Once our team verifies it, your property will go live on the Listings page, and you'll be notified!`
-
   const [addProperyModalCurrentStep, setAddProperyModalCurrentStep] =
     useState(0)
 
-  const steps = [
-    {
-      title: 'Property Overview',
-      content: 'First-content',
-    },
-    {
-      title: 'Amentities',
-      content: 'Second-content',
-    },
-    {
-      title: 'Media',
-      content: 'Last-content',
-    },
-    {
-      title: 'Final Details',
-      content: 'Last-content',
-    },
-  ]
-
   const items = steps.map((item) => ({ key: item.title, title: item.title }))
-
-  const amenities_list = [
-    {
-      label: 'Air Conditioning',
-      value: 'air_conditioning',
-    },
-    {
-      label: 'Parking',
-      value: 'parking',
-    },
-    {
-      label: 'Dishwasher',
-      value: 'dishwasher',
-    },
-    {
-      label: 'Heating',
-      value: 'heating',
-    },
-    {
-      label: 'Gym Access',
-      value: 'gym',
-    },
-    {
-      label: 'Refrigerator',
-      value: 'refrigerator',
-    },
-    {
-      label: 'Laundry',
-      value: 'laundry',
-    },
-    {
-      label: 'Swimming Pool',
-      value: 'swimming_pool',
-    },
-    {
-      label: 'Microwave',
-      value: 'microwave',
-    },
-  ]
-
-  const property_types = [
-    {
-      label: 'Apartment',
-      value: 'apartment',
-    },
-    {
-      label: 'House',
-      value: 'house',
-    },
-    {
-      label: 'Condo',
-      value: 'condo',
-    },
-  ]
-
-  const bedroom_list = [
-    {
-      label: '1',
-      value: '1',
-    },
-    {
-      label: '2',
-      value: '2',
-    },
-    {
-      label: '3',
-      value: '3',
-    },
-
-    {
-      label: '4',
-      value: '4',
-    },
-    {
-      label: '5',
-      value: '5',
-    },
-  ]
-
-  const bathroom_list = [
-    {
-      label: '1',
-      value: '1',
-    },
-    {
-      label: '2',
-      value: '2',
-    },
-    {
-      label: '3',
-      value: '3',
-    },
-
-    {
-      label: '4',
-      value: '4',
-    },
-    {
-      label: '5',
-      value: '5',
-    },
-  ]
 
   const [form] = useForm()
   const [fileList, setFileList] = useState([])
@@ -206,6 +62,8 @@ const AddProperty = () => {
   const [propertyListing, setPropertyListing] = useState([])
   const [initialValues, setInitailValues] = useState(null)
   const [isEdit, setIdEdit] = useState(false)
+  const [previewOpen, setPreviewOpen] = useState(false)
+  const [previewImage, setPreviewImage] = useState('')
 
   const handleAddPropertyModalOpen = (isEdit, initialValues) => {
     setIdEdit(isEdit)
@@ -236,10 +94,6 @@ const AddProperty = () => {
     getPropertyListings()
   }, [])
 
-  useEffect(() => {
-    console.log(fileList)
-  }, [fileList])
-
   const getPropertyListings = async () => {
     const res = await propertiesService.getPropertyListings()
     if (res.data) {
@@ -256,22 +110,36 @@ const AddProperty = () => {
       )
     )
 
+    form.validateFields(['media'])
     return false
   }
 
-  const visibleFileList = fileList.filter((file) => file.status !== 'removed')
+  const visibleFileList = fileList.filter(
+    (file) => file.status !== 'removed' && file.status !== 'ignored'
+  )
 
-  const handleUploadChange = ({ file, fileList: newFileList }) => {
-    // Ensure only new files from the device are added to the list
-    const updatedList = newFileList.map((f) => {
-      if (!f.url) {
-        // Files from the device will not have a URL; mark them as new
-        return { ...f, status: 'new' }
-      }
-      return f
-    })
-    setFileList(updatedList)
+  const handleUploadChange = ({ file }) => {
+    setFileList([
+      ...fileList,
+      { uid: file.uid, status: 'new', originFileObj: file, name: file.name },
+    ])
   }
+
+  const handlePreview = async (file) => {
+    if (!file.url && !file.preview) {
+      file.preview = await getBase64(file.originFileObj)
+    }
+    setPreviewImage(file.url || file.preview)
+    setPreviewOpen(true)
+  }
+
+  const getBase64 = (file) =>
+    new Promise((resolve, reject) => {
+      const reader = new FileReader()
+      reader.readAsDataURL(file)
+      reader.onload = () => resolve(reader.result)
+      reader.onerror = (error) => reject(error)
+    })
 
   const onFinish = () => {
     form.validateFields().then(async () => {
@@ -279,6 +147,10 @@ const AddProperty = () => {
       const requestObj = {
         ...formValues,
         available_since: formValues.available_since.format('YYYY-MM-DD'),
+        amenities: amenitiesList.reduce((acc, amenity) => {
+          acc[amenity.value] = formValues.amenities.includes(amenity.value)
+          return acc
+        }, {}),
       }
       const filesToDelete = fileList.filter((file) => file.status === 'removed')
       const filesToUpload = fileList.filter((file) => file.status === 'new')
@@ -348,7 +220,27 @@ const AddProperty = () => {
   }
 
   const validateFields = () => {
-    form.validateFields().then(async () => {
+    form.validateFields().then(async (values) => {
+      if (!isEdit && addProperyModalCurrentStep === 0) {
+        const requestObj = {
+          street_address: values.street_address,
+          city: values.city,
+          state: values.state,
+          zip_code: values.zip_code,
+        }
+        setLoading(true)
+        const response = await propertiesService.validateAddress(requestObj)
+        setLoading(false)
+        if (response.success && response.data.legit) {
+          setAddProperyModalCurrentStep(addProperyModalCurrentStep + 1)
+        } else {
+          notification.error({
+            message: 'Invalid Address',
+            description: 'Please provide a valid address',
+          })
+          return
+        }
+      }
       setAddProperyModalCurrentStep(addProperyModalCurrentStep + 1)
     })
   }
@@ -461,7 +353,7 @@ const AddProperty = () => {
                             isEdit ? initialValues.address.street_address : ''
                           }
                         >
-                          <Input placeholder="Street Address" />
+                          <Input placeholder="Street Address" disabled={isEdit}/>
                         </Form.Item>
                       </Col>
                     </Row>
@@ -480,7 +372,7 @@ const AddProperty = () => {
                             isEdit ? initialValues.address.city : ''
                           }
                         >
-                          <Input placeholder="City" />
+                          <Input placeholder="City" disabled={isEdit}/>
                         </Form.Item>
                       </Col>
                       <Col span={8}>
@@ -492,11 +384,15 @@ const AddProperty = () => {
                               message: 'Please enter state',
                             },
                           ]}
-                          initialValue={
-                            isEdit ? initialValues.address.state : ''
-                          }
+                          initialValue={'NY'}
                         >
-                          <Input placeholder="State" />
+                          <Select disabled={true}>
+                            {states.map((item) => (
+                              <Option key={item.value} value={item.value}>
+                                {item.label}
+                              </Option>
+                            ))}
+                          </Select>
                         </Form.Item>
                       </Col>
                       <Col span={8}>
@@ -507,12 +403,16 @@ const AddProperty = () => {
                               required: true,
                               message: 'Please enter a zipcode',
                             },
+                            {
+                              pattern: /^[0-9]\d{4}$/,
+                              message: 'Please enter valid zipcode',
+                            },
                           ]}
                           initialValue={
                             isEdit ? initialValues.address.zip_code : ''
                           }
                         >
-                          <Input placeholder="Zip Code" />
+                          <Input placeholder="Zip Code" disabled={isEdit}/>
                         </Form.Item>
                       </Col>
                     </Row>
@@ -533,8 +433,8 @@ const AddProperty = () => {
                             isEdit ? initialValues.details.property_type : ''
                           }
                         >
-                          <Select placeholder="Select type of property">
-                            {property_types.map((property_type) => (
+                          <Select placeholder="Select type of property" disabled={isEdit}>
+                            {propertyTypes.map((property_type) => (
                               <Option
                                 key={property_type?.value}
                                 value={property_type?.value}
@@ -559,13 +459,10 @@ const AddProperty = () => {
                             isEdit ? initialValues.details.bedrooms : ''
                           }
                         >
-                          <Select placeholder="Select number of bedrooms">
-                            {bedroom_list.map((bedroom) => (
-                              <Option
-                                key={bedroom?.value}
-                                value={bedroom?.value}
-                              >
-                                {bedroom?.label}
+                          <Select placeholder="Select number of bedrooms" disabled={isEdit}>
+                            {range(5).map((item) => (
+                              <Option key={item} value={item}>
+                                {item}
                               </Option>
                             ))}
                           </Select>
@@ -585,13 +482,10 @@ const AddProperty = () => {
                             isEdit ? initialValues.details.bathrooms : ''
                           }
                         >
-                          <Select placeholder="Select number of bathrooms">
-                            {bathroom_list.map((bathroom) => (
-                              <Option
-                                key={bathroom?.value}
-                                value={bathroom?.value}
-                              >
-                                {bathroom?.label}
+                          <Select placeholder="Select number of bathrooms" disabled={isEdit}>
+                            {range(5).map((item) => (
+                              <Option key={item} value={item}>
+                                {item}
                               </Option>
                             ))}
                           </Select>
@@ -619,6 +513,7 @@ const AddProperty = () => {
                         rows={4}
                         placeholder="Describe the property, unique features, nearby attractions, etc."
                         maxLength={255}
+                        disabled={isEdit}
                       />
                     </Form.Item>
 
@@ -638,7 +533,7 @@ const AddProperty = () => {
                     >
                       <Checkbox.Group style={{ width: '100%' }}>
                         <Row gutter={16}>
-                          {amenities_list.map((amenity) => (
+                          {amenitiesList.map((amenity) => (
                             <Col span={8}>
                               <Checkbox
                                 key={amenity?.value}
@@ -655,12 +550,27 @@ const AddProperty = () => {
                 )}
                 {addProperyModalCurrentStep === 2 && (
                   <>
-                    <Form.Item label="Media Upload" name="media">
+                    <Form.Item
+                      label="Media Upload"
+                      name="media"
+                      rules={[
+                        {
+                          message: 'Maximum 3 images can only be uploaded',
+                          validator: () => {
+                            if (visibleFileList.length < 4)
+                              return Promise.resolve()
+                            return Promise.reject()
+                          },
+                        },
+                      ]}
+                    >
                       <Dragger
                         fileList={visibleFileList}
                         onRemove={handleRemove}
                         onChange={handleUploadChange}
                         beforeUpload={() => false}
+                        listType="picture-card"
+                        onPreview={handlePreview}
                       >
                         <p className="ant-upload-drag-icon">
                           <PictureOutlined />
@@ -675,6 +585,20 @@ const AddProperty = () => {
                         </p>
                       </Dragger>
                     </Form.Item>
+                    {previewImage && (
+                      <Image
+                        wrapperStyle={{
+                          display: 'none',
+                        }}
+                        preview={{
+                          visible: previewOpen,
+                          onVisibleChange: (visible) => setPreviewOpen(visible),
+                          afterOpenChange: (visible) =>
+                            !visible && setPreviewImage(''),
+                        }}
+                        src={previewImage}
+                      />
+                    )}
                   </>
                 )}
                 {addProperyModalCurrentStep === 3 && (

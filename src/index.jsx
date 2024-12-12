@@ -5,6 +5,7 @@ import { BrowserRouter } from 'react-router-dom'
 import RouterConfig from 'src/navigation/RouterConfig'
 import { ConfigProvider, App } from 'antd'
 import './index.css'
+import 'bootstrap/dist/css/bootstrap.min.css'
 
 createRoot(document.getElementById('root')).render(
   <ConfigProvider
