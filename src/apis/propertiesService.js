@@ -75,4 +75,11 @@ export default {
       return error.data;
     }
   },
+  validateAddress: async (requestObj) => {
+    try {
+      return await api.post(API_URLS?.validate_address, requestObj)
+    } catch (error) {
+      return error.data
+    }
+  },
 }

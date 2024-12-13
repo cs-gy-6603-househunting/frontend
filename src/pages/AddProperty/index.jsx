@@ -333,10 +333,10 @@ const AddProperty = () => {
             'deleted_images',
             JSON.stringify(filesToDelete.map((file) => file.uid))
           )
-          // const uploadRes = await propertiesService.propertyUploadImage(
-          //   formData
-          // )
-          // if (uploadRes.success) {
+          const uploadRes = await propertiesService.propertyUploadImage(
+            formData
+          )
+          if (uploadRes.success) {
             notification.success({
               message: 'Property Updated',
               description: 'Successfully updated property to listing',
@@ -344,7 +344,7 @@ const AddProperty = () => {
             form.resetFields()
             handleAddPropertyModalClose()
             setAddProperyModalCurrentStep(0)
-          // }
+          }
         }
         setLoading(false)
       } else {
@@ -361,10 +361,10 @@ const AddProperty = () => {
             'deleted_images',
             JSON.stringify(filesToDelete.map((file) => file.url))
           )
-          // const uploadRes = await propertiesService.propertyUploadImage(
-          //   formData
-          // )
-          // if (uploadRes.success) {
+          const uploadRes = await propertiesService.propertyUploadImage(
+            formData
+          )
+          if (uploadRes.success) {
             notification.success({
               message: 'Property Added',
               description: 'Successfully added property to listing',
@@ -372,7 +372,7 @@ const AddProperty = () => {
             form.resetFields()
             handleAddPropertyModalClose()
             setAddProperyModalCurrentStep(0)
-          // }
+          }
         }
         setLoading(false)
       }
@@ -388,18 +388,10 @@ const AddProperty = () => {
 
   const handleSubmitForVerification = async (propertyId) => {
     try {
-      if (!propertyId) {
-        throw new Error('Property ID is required');
-      }
-
-      console.log('Submitting property for verification:', propertyId);
+      console.log("response")
       const response = await propertiesService.submitPropertyForVerification(propertyId);
-      
-      if (!response) {
-        throw new Error('No response received from server');
-      }
-
-      if (response.success) {
+      console.log(response)
+      if (response?.success) {
         notification.success({
           message: 'Success',
           description: response.message,
@@ -408,17 +400,16 @@ const AddProperty = () => {
       } else {
         notification.error({
           message: 'Error',
-          description: response.error || 'Failed to submit property for verification',
+          description: response?.error || 'Something went wrong!',
         });
       }
     } catch (error) {
-      console.error('Verification submission error:', error);
       notification.error({
         message: 'Error',
-        description: error.message || 'An unexpected error occurred during verification submission',
+        description: 'An unexpected error occurred!',
       });
     }
-};
+  };
 
   return (
     <div > 
@@ -910,7 +901,7 @@ const AddProperty = () => {
                       width: "1740px",
                     }}
                   > */}
-                    <div style={{ flex: 1, padding: "5px", display: "flex", width: "100%" }}>
+                    <div style={{ flex: 1, padding: "5px", display: "flex", width: "1750px" }}>
                       {/* Property Image */}
                       {/* <div style={{ padding: "0", margin: "0" }}> */}
                       {/* Property Image Carousel */}
