@@ -10,6 +10,9 @@ export const API_URLS = {
   request_new_verify_link: '/api/auth/verify/generatenew/',
   lessee_profile: '/api/auth/lessee_setup',
   lessor_profile: '/api/auth/lessor_setup',
+  get_all_property_listing_api: '/api/properties/get-all-properties',
+  submit_property_verification_api: 'api/properties/submit-verification/',
+  search_properties_api: 'api/properties/search/'
 }
 
 export const AUTH_NOT_REQUIRED_APIS = [

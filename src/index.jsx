@@ -5,17 +5,10 @@ import { BrowserRouter } from 'react-router-dom'
 import RouterConfig from 'src/navigation/RouterConfig'
 import { ConfigProvider, App } from 'antd'
 import './index.css'
-import 'bootstrap/dist/css/bootstrap.min.css'
 
 createRoot(document.getElementById('root')).render(
   <ConfigProvider
-    theme={{
-      token: {
-        fontFamily: 'poppins',
-        colorPrimary: '#DE7272',
-        colorLink: '#DE7272',
-      },
-    }}
+    
   >
     <Provider store={store}>
       <BrowserRouter>
