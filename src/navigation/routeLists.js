@@ -37,4 +37,19 @@ export const routeLists = [
     component: AllPages.AddProperty,
     path: AllNavigation.ADD_PROPERTY,
   },
+  {
+    key: 'property-verifications',
+    component: AllPages.PropertyVerificationRequests,
+    path: AllNavigation.PROPERTY_VERIFICATION_REQUESTS,
+  },
+  {
+    key: 'about',
+    component: AllPages.AboutUs,
+    path: AllNavigation.ABOUT_US,
+  },
+  {
+    key: 'search-properties',
+    component: AllPages.SearchProperties,
+    path: AllNavigation.SEARCH_PROPERTIES,
+  },
 ]
