@@ -1,14 +1,18 @@
-import styled from "styled-components";
-import { verticalFlex } from "src/global-styles/utils";
+import styled from 'styled-components'
+import { verticalFlex } from 'src/global-styles/utils'
 
 export const LoginWrapper = styled.div`
-  background: linear-gradient(135deg, #B0DDE7, #EAF9FE); /* Lighter, softer gradient */
+  background: linear-gradient(
+    135deg,
+    #b0dde7,
+    #eaf9fe
+  ); /* Lighter, softer gradient */
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
   padding: 20px; /* Adds spacing for small screens */
-`;
+`
 
 export const LoginContainer = styled.div`
   ${verticalFlex}
@@ -18,10 +22,14 @@ export const LoginContainer = styled.div`
   overflow: hidden;
   height: auto;
   backdrop-filter: blur(18px) saturate(180%); /* Enhanced glassmorphism effect */
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.8), rgba(235, 245, 255, 0.6)); /* Subtle and light */
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.8),
+    rgba(235, 245, 255, 0.6)
+  ); /* Subtle and light */
   border: 1px solid rgba(255, 255, 255, 0.3); /* Glass-like border */
   padding: 25px 30px; /* Increased padding for spacing */
-`;
+`
 
 export const TitleContainer = styled.div`
   text-align: center;
@@ -31,7 +39,7 @@ export const TitleContainer = styled.div`
   color: #0a3d62; /* Soft, contrasting color */
   background: none; /* Remove background color */
   border-bottom: 1px solid rgba(0, 0, 0, 0.1); /* Subtle border */
-`;
+`
 
 export const TabPane = styled.div`
   padding: 20px;
@@ -40,12 +48,16 @@ export const TabPane = styled.div`
   gap: 16px;
   align-items: stretch;
 
-  input {
+  .ant-input-outlined {
     border-radius: 8px;
     border: 1px solid rgba(0, 0, 0, 0.1);
-    padding: 10px;
+    padding: 8px;
     background: rgba(255, 255, 255, 0.7);
     box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+
+    .ant-input {
+      padding: none;
+    }
 
     &:autofill,
     &:autofill:hover,
@@ -57,7 +69,7 @@ export const TabPane = styled.div`
   }
 
   button {
-    background: linear-gradient(135deg, #10A3C2, #66C5D8);
+    background: linear-gradient(135deg, #10a3c2, #66c5d8);
     border: none;
     border-radius: 8px;
     padding: 10px 20px;
@@ -68,11 +80,11 @@ export const TabPane = styled.div`
     transition: all 0.3s ease;
 
     &:hover {
-      background: linear-gradient(135deg, #0E8CA8, #54B3C6);
+      background: linear-gradient(135deg, #0e8ca8, #54b3c6);
       box-shadow: 0px 6px 16px rgba(16, 163, 194, 0.5);
     }
   }
-`;
+`
 
 export const LogoContainer = styled.div`
   display: flex;
@@ -92,4 +104,4 @@ export const LogoContainer = styled.div`
     color: #003952; /* Darker shade to contrast with the light background */
     text-align: center;
   }
-`;
+`

@@ -63,10 +63,30 @@ export default {
   },
   searchProperties: async (requestObj) => {
     try {
-      const response = await api.get(`${API_URLS.search_properties_api}?location=${requestObj.location}&radius=${requestObj.radius}&page=1`);
+      const response = await api.get(API_URLS.search_properties_api,{
+        params:{
+          location: requestObj.location,
+          radius: requestObj.radius,
+          min_rent: requestObj.min_rent,
+          max_rent: requestObj.max_rent,
+          bathrooms: requestObj.bathrooms,
+          bedrooms: requestObj.bedrooms,
+          property_type: requestObj.property_type,
+          page: requestObj.page,
+          sort_by: requestObj.sort_by,
+        }
+      });
       return response;
     } catch (error) {
       return error.data;
+    }
+  },
+  addToWishlist: async (requestObj) => {
+    try {
+      const response = await api.post(API_URLS?.add_to_wishlist_api, requestObj)
+      return response
+    } catch (error) {
+      return error.data
     }
   },
   validateAddress: async (requestObj) => {

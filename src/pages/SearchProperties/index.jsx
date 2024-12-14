@@ -1,71 +1,125 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  Layout, Row, Col, Card, Form, Input, Button, Select, InputNumber, 
-  Carousel, Typography, Divider, Tag, List, Empty, Spin, Pagination
-} from 'antd';
-import { 
-  SearchOutlined, HomeOutlined, DollarOutlined, 
-  BankOutlined
-} from '@ant-design/icons';
+import React, { useState, useEffect } from 'react'
+import {
+  Layout,
+  Row,
+  Col,
+  Card,
+  Form,
+  Input,
+  Button,
+  Select,
+  InputNumber,
+  Carousel,
+  Typography,
+  Divider,
+  Tag,
+  List,
+  Empty,
+  Spin,
+  Pagination,
+} from 'antd'
+import {
+  SearchOutlined,
+  HomeOutlined,
+  DollarOutlined,
+  BankOutlined,
+  HeartOutlined,
+  HeartFilled,
+} from '@ant-design/icons'
 import propertiesService from 'src/apis/propertiesService'
+import { range } from 'src/utils/utils'
+import { App } from 'antd'
+import { message } from 'antd'
+import { useSelector } from 'react-redux'
 
-const { Header, Content } = Layout;
-const { Title, Text } = Typography;
-const { Option } = Select;
+const { Header, Content } = Layout
+const { Title, Text } = Typography
+const { Option } = Select
 
 const PropertySearch = () => {
-  const [properties, setProperties] = useState([]);
-  const [totalPages, setTotalPages] = useState(1);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [properties, setProperties] = useState([])
+  const [totalPages, setTotalPages] = useState(1)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState(null)
 
-  const [form] = Form.useForm();
+  const [form] = Form.useForm()
+  const user = useSelector((state) => state.auth.user)
+  const { notification } = App.useApp()
 
   const fetchProperties = async (values) => {
-    setIsLoading(true);
-    setError(null);
-  
+    setIsLoading(true)
+    setError(null)
+
     try {
-      const response = await propertiesService.searchProperties(values);
-  
+      const response = await propertiesService.searchProperties(values)
+
       if (response.success) {
-        let filteredProperties = response.data.properties;
-  
+        let filteredProperties = response.data.properties
+
         if (values.min_rent) {
           filteredProperties = filteredProperties.filter(
             (property) => property.details.rent >= values.min_rent
-          );
+          )
         }
-  
+
         if (values.max_rent) {
           filteredProperties = filteredProperties.filter(
             (property) => property.details.rent <= values.max_rent
-          );
+          )
         }
-  
-        setProperties(filteredProperties);
-        setTotalPages(response.data.total_pages);
+
+        setProperties(filteredProperties)
+        setTotalPages(response.data.total_pages)
       } else {
-        setError(response.message);
+        setError(response.message)
       }
     } catch (err) {
-    //   setError('An error occurred while fetching properties.');
+      //   setError('An error occurred while fetching properties.');
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
-  
+  }
 
   useEffect(() => {
-    const values = form.getFieldsValue();
-    fetchProperties(values);
-  }, [currentPage]);
+    const values = form.getFieldsValue()
+    fetchProperties(values)
+  }, [])
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page)
+    const values = form.getFieldsValue()
+    fetchProperties({ ...values, page })
+  }
 
   const onFinish = (values) => {
-    setCurrentPage(1);
-    fetchProperties(values);
-  };
+    setCurrentPage(1)
+    fetchProperties({ ...values, page: 1 })
+  }
+
+  const toggleWishlist = async (property) => {
+    const requestObj = {
+      property_id: property.id,
+      lessee_id: user.userId,
+    }
+    const response = await propertiesService.addToWishlist(requestObj)
+    if (response.success) {
+      notification.success({
+        message: 'Success',
+        description: response.data.message,
+      })
+      setProperties((prevProperties) =>
+        prevProperties.map((p) =>
+          p.id === property.id ? { ...p, isInWishlist: !p.isInWishlist } : p
+        )
+      )
+    } else {
+      notification.error({
+        message: 'Error',
+        description: response.data.message,
+      })
+    }
+  }
 
   return (
     <Layout
@@ -82,20 +136,37 @@ const PropertySearch = () => {
           <Form form={form} onFinish={onFinish} layout="vertical">
             <Row gutter={16}>
               <Col span={8}>
-                <Form.Item name="location" label="Location" rules={[{ required: true, message: 'Please enter a location' }]}>
-                  <Input prefix={<SearchOutlined />} placeholder="Enter location" />
+                <Form.Item
+                  name="location"
+                  label="Location"
+                  rules={[
+                    { required: true, message: 'Please enter a location' },
+                  ]}
+                  initialValue={'10001'}
+                >
+                  <Input
+                    prefix={<SearchOutlined />}
+                    placeholder="Enter location"
+                  />
                 </Form.Item>
               </Col>
               <Col span={4}>
-                <Form.Item name="radius" label="Radius (km)" rules={[{ required: true, message: 'Please enter a radius' }]}>
+                <Form.Item
+                  name="radius"
+                  label="Radius (km)"
+                  rules={[{ required: true, message: 'Please enter a radius' }]}
+                  initialValue={5}
+                >
                   <InputNumber min={1} max={100} style={{ width: '100%' }} />
                 </Form.Item>
               </Col>
               <Col span={6}>
                 <Form.Item name="min_rent" label="Min Rent">
                   <InputNumber
-                    formatter={value => `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                    parser={value => value.replace(/\$\s?|(,*)/g, '')}
+                    formatter={(value) =>
+                      `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+                    }
+                    parser={(value) => value.replace(/\$\s?|(,*)/g, '')}
                     style={{ width: '100%' }}
                   />
                 </Form.Item>
@@ -103,8 +174,10 @@ const PropertySearch = () => {
               <Col span={6}>
                 <Form.Item name="max_rent" label="Max Rent">
                   <InputNumber
-                    formatter={value => `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                    parser={value => value.replace(/\$\s?|(,*)/g, '')}
+                    formatter={(value) =>
+                      `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+                    }
+                    parser={(value) => value.replace(/\$\s?|(,*)/g, '')}
                     style={{ width: '100%' }}
                   />
                 </Form.Item>
@@ -113,28 +186,33 @@ const PropertySearch = () => {
             <Row gutter={16}>
               <Col span={6}>
                 <Form.Item name="bedrooms" label="Bedrooms">
-                  <Select placeholder="Select bedrooms">
-                    {[1, 2, 3, 4, 5].map(num => (
-                      <Option key={num} value={num}>{num}+ bd</Option>
+                  <Select placeholder="Select bedrooms" allowClear>
+                    {range(5).map((num) => (
+                      <Option key={num} value={num}>
+                        {num}+ bd
+                      </Option>
                     ))}
                   </Select>
                 </Form.Item>
               </Col>
               <Col span={6}>
                 <Form.Item name="bathrooms" label="Bathrooms">
-                  <Select placeholder="Select bathrooms">
-                    {[1, 2, 3, 4, 5].map(num => (
-                      <Option key={num} value={num}>{num}+ ba</Option>
+                  <Select placeholder="Select bathrooms" allowClear>
+                    {range(5).map((num) => (
+                      <Option key={num} value={num}>
+                        {num}+ ba
+                      </Option>
                     ))}
                   </Select>
                 </Form.Item>
               </Col>
               <Col span={6}>
                 <Form.Item name="property_type" label="Property Type">
-                  <Select placeholder="Select property type">
+                  <Select placeholder="Select property type" allowClear>
                     <Option value="apartment">Apartment</Option>
                     <Option value="house">House</Option>
                     <Option value="condo">Condo</Option>
+                    <Option value="studio">Studio</Option>
                   </Select>
                 </Form.Item>
               </Col>
@@ -150,7 +228,11 @@ const PropertySearch = () => {
               </Col>
             </Row>
             <Form.Item>
-              <Button type="primary" htmlType="submit" icon={<SearchOutlined />}>
+              <Button
+                type="primary"
+                htmlType="submit"
+                icon={<SearchOutlined />}
+              >
                 Search Properties
               </Button>
             </Form.Item>
@@ -179,34 +261,80 @@ const PropertySearch = () => {
                     <Row gutter={16}>
                       <Col span={8}>
                         <Carousel autoplay>
-                          {property.images.map((image) => (
-                            <div key={image.id}>
-                              <img
-                                src={image.url}
-                                alt={property.title}
-                                style={{ width: '100%', height: 200, objectFit: 'cover' }}
-                              />
-                            </div>
-                          ))}
+                          {property.images.length !== 0 &&
+                            property.images.map((image) => (
+                              <div key={image.id}>
+                                <img
+                                  src={image.url}
+                                  alt={property.title}
+                                  style={{
+                                    width: '100%',
+                                    height: 200,
+                                    objectFit: 'cover',
+                                  }}
+                                />
+                              </div>
+                            ))}
                         </Carousel>
                       </Col>
                       <Col span={16}>
-                        <Title level={4}>${property.details.rent}/month</Title>
+                        <div
+                          style={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                          }}
+                        >
+                          <Title level={4}>
+                            ${property.details.rent}/month
+                          </Title>
+                          <Button
+                            type="text"
+                            icon={
+                              property.isInWishlist ? (
+                                <HeartFilled
+                                  style={{
+                                    fontSize: '20px',
+                                    color: '#ff4d4f', // Base red color
+                                    filter:
+                                      'drop-shadow(0 0 2px rgba(255,77,79,0.3))', // Adds a subtle glow
+                                    background:
+                                      'linear-gradient(45deg, #ff4d4f, #ff7875)',
+                                    backgroundClip: 'text',
+                                    WebkitBackgroundClip: 'text',
+                                    WebkitTextFillColor: 'transparent',
+                                  }}
+                                />
+                              ) : (
+                                <HeartOutlined
+                                  style={{
+                                    fontSize: '20px',
+                                    color: '#d9d9d9', // Light gray for non-wishlist items
+                                  }}
+                                />
+                              )
+                            }
+                            onClick={() => toggleWishlist(property)}
+                          />
+                        </div>
                         <Text strong>{property.title}</Text>
                         <br />
                         <Text type="secondary">
-                          {property.address.street_address}, {property.address.city}, {property.address.state} {property.address.zip_code}
+                          {property.address.street_address},{' '}
+                          {property.address.city}, {property.address.state}{' '}
+                          {property.address.zip_code}
                         </Text>
                         <br />
                         <Text>
-                          <HomeOutlined /> {property.details.bedrooms} bd | 
-                          <HomeOutlined /> {property.details.bathrooms} ba | 
+                          <HomeOutlined /> {property.details.bedrooms} bd |
+                          <HomeOutlined /> {property.details.bathrooms} ba |
                           <BankOutlined /> {property.details.property_type}
                         </Text>
                         <br />
                         <Text>{property.details.description}</Text>
                         <br />
-                        <Tag color="blue">{property.distance.toFixed(2)} km away</Tag>
+                        <Tag color="blue">
+                          {property.distance.toFixed(2)} km away
+                        </Tag>
                       </Col>
                     </Row>
                   </Card>
@@ -222,15 +350,14 @@ const PropertySearch = () => {
               <Pagination
                 current={currentPage}
                 total={totalPages * 10}
-                onChange={(page) => setCurrentPage(page)}
+                onChange={(page) => handlePageChange(page)}
               />
             </Col>
           </Row>
         )}
       </Content>
     </Layout>
-  );
-};
+  )
+}
 
-export default PropertySearch;
-
+export default PropertySearch

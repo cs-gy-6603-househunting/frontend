@@ -36,13 +36,12 @@ const LayoutContainer = () => {
 
   const profileMenu = (
     <Menu
-      mode="vertical"
+      mode="inline"
       selectable={false}
       style={{
         width: '150px', // Set an appropriate width
         padding: '8px', // Add padding for better spacing
-        boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)', // Subtle shadow for better visibility
-        borderRadius: '8px', // Rounded corners for a modern look
+        borderInlineEnd: 'none',
       }}
     >
       <Menu.Item
