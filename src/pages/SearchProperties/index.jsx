@@ -38,7 +38,8 @@ const { Option } = Select
 
 const PropertySearch = () => {
   const [properties, setProperties] = useState([])
-  const [totalPages, setTotalPages] = useState(1)
+  const [totalCount, setTotalCount] = useState(0)
+  const [pageSize, setPageSize] = useState(10)
   const [currentPage, setCurrentPage] = useState(1)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState(null)
@@ -70,7 +71,7 @@ const PropertySearch = () => {
         }
 
         setProperties(filteredProperties)
-        setTotalPages(response.data.total_pages)
+        setTotalCount(response.data.total_count)
       } else {
         setError(response.message)
       }
@@ -83,18 +84,25 @@ const PropertySearch = () => {
 
   useEffect(() => {
     const values = form.getFieldsValue()
-    fetchProperties(values)
+    fetchProperties({ ...values, page: 1, per_page: pageSize })
   }, [])
 
-  const handlePageChange = (page) => {
-    setCurrentPage(page)
-    const values = form.getFieldsValue()
-    fetchProperties({ ...values, page })
+  const handlePageChange = (page, newPageSize) => {
+    if (newPageSize !== pageSize) {
+      setPageSize(newPageSize)
+      setCurrentPage(1)
+      const values = form.getFieldsValue()
+      fetchProperties({ ...values, page: 1, per_page: newPageSize })
+    } else {
+      setCurrentPage(page)
+      const values = form.getFieldsValue()
+      fetchProperties({ ...values, page, per_page: pageSize })
+    }
   }
 
   const onFinish = (values) => {
     setCurrentPage(1)
-    fetchProperties({ ...values, page: 1 })
+    fetchProperties({ ...values, page: 1, per_page: pageSize })
   }
 
   const toggleWishlist = async (property) => {
@@ -325,9 +333,7 @@ const PropertySearch = () => {
                         </Text>
                         <br />
                         <Text>
-                          <HomeOutlined /> {property.details.bedrooms} bd |
-                          <HomeOutlined /> {property.details.bathrooms} ba |
-                          <BankOutlined /> {property.details.property_type}
+                          {`🛏️ ${property.details.bedrooms} bd • 🛁 ${property.details.bathrooms} ba • 🏠 ${property.details.property_type}`}
                         </Text>
                         <br />
                         <Text>{property.details.description}</Text>
@@ -349,8 +355,11 @@ const PropertySearch = () => {
             <Col>
               <Pagination
                 current={currentPage}
-                total={totalPages * 10}
-                onChange={(page) => handlePageChange(page)}
+                total={totalCount}
+                pageSize={pageSize}
+                onChange={(page, pageSize) => handlePageChange(page, pageSize)}
+                pageSizeOptions={[10, 30, 50, 100]}
+                showSizeChanger={true}
               />
             </Col>
           </Row>

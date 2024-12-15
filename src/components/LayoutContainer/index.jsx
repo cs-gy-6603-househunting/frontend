@@ -25,7 +25,6 @@ const LayoutContainer = () => {
   const { logout } = useAuth()
 
   const handleMenuClick = (e) => {
-    console.log(e)
     navigate(`/${e.key}`)
   }
 
@@ -95,6 +94,7 @@ const LayoutContainer = () => {
     } else {
       return [
         <Menu.Item key="search-properties">{`Search Properties`}</Menu.Item>,
+        <Menu.Item key="wishlist">{`Wishlist`}</Menu.Item>,
         <Menu.Item key="about">{`About Us`}</Menu.Item>,
         <Menu.Item key="contact">{`Contact`}</Menu.Item>,
       ]

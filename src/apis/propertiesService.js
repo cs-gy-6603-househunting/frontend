@@ -53,18 +53,21 @@ export default {
   },
   submitPropertyForVerification: async (propertyId) => {
     try {
-      const response = await api.post(API_URLS?.submit_property_verification_api, {
-        property_id: propertyId,
-      });
-      return response;
+      const response = await api.post(
+        API_URLS?.submit_property_verification_api,
+        {
+          property_id: propertyId,
+        }
+      )
+      return response
     } catch (error) {
-      return error.data;
+      return error.data
     }
   },
   searchProperties: async (requestObj) => {
     try {
-      const response = await api.get(API_URLS.search_properties_api,{
-        params:{
+      const response = await api.get(API_URLS.search_properties_api, {
+        params: {
           location: requestObj.location,
           radius: requestObj.radius,
           min_rent: requestObj.min_rent,
@@ -73,17 +76,18 @@ export default {
           bedrooms: requestObj.bedrooms,
           property_type: requestObj.property_type,
           page: requestObj.page,
+          per_page: requestObj.per_page,
           sort_by: requestObj.sort_by,
-        }
-      });
-      return response;
+        },
+      })
+      return response
     } catch (error) {
-      return error.data;
+      return error.data
     }
   },
   addToWishlist: async (requestObj) => {
     try {
-      const response = await api.post(API_URLS?.add_to_wishlist_api, requestObj)
+      const response = await api.post(API_URLS?.wishlist_api, requestObj)
       return response
     } catch (error) {
       return error.data
@@ -92,6 +96,18 @@ export default {
   validateAddress: async (requestObj) => {
     try {
       return await api.post(API_URLS?.validate_address, requestObj)
+    } catch (error) {
+      return error.data
+    }
+  },
+  getWishlistedProperties: async (requestObj) => {
+    try {
+      return await api.get(API_URLS?.wishlist_api, {
+        params: {
+          page: requestObj.page,
+          per_page: requestObj.per_page,
+        },
+      })
     } catch (error) {
       return error.data
     }

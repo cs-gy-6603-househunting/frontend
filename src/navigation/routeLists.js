@@ -52,4 +52,9 @@ export const routeLists = [
     component: AllPages.SearchProperties,
     path: AllNavigation.SEARCH_PROPERTIES,
   },
+  {
+    key: 'wishlist',
+    component: AllPages.Wishlist,
+    path: AllNavigation.WISHLIST,
+  },
 ]
