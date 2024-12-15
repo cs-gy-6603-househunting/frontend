@@ -13,7 +13,8 @@ export const API_URLS = {
   get_all_property_listing_api: '/api/properties/get-all-properties',
   submit_property_verification_api: 'api/properties/submit-verification/',
   search_properties_api: 'api/properties/search/',
-  wishlist_api: 'api/properties/wishlist/'
+  wishlist_api: 'api/properties/wishlist/',
+  my_listings_api: 'api/properties/my-listings/',
 }
 
 export const AUTH_NOT_REQUIRED_APIS = [

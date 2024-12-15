@@ -92,7 +92,7 @@ api.interceptors.response.use(
       } else if (err.response.status && err.response.status === 401) {
         return handleUnauthorizedAccess(err)
       } else if (err.response.status && err.response.status === 403) {
-        return handleForbiddenAccess(err)
+        return err.response.data
       } else if (err.response.status && err.response.status === 400) {
         return err.response.data
       } else {

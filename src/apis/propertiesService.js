@@ -112,4 +112,16 @@ export default {
       return error.data
     }
   },
+  getMyListings: async (requestObj) => {
+    try {
+      return await api.get(API_URLS?.my_listings_api, {
+        params: {
+          page: requestObj.page,
+          per_page: requestObj.per_page,
+        },
+      })
+    } catch (error) {
+      return error.data
+    }
+  },
 }

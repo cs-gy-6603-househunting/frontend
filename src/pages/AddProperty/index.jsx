@@ -22,6 +22,7 @@ import {
   Tooltip,
   Typography,
   Layout,
+  Pagination,
 } from 'antd'
 
 import Icon, {
@@ -83,6 +84,9 @@ const AddProperty = () => {
   const [isEdit, setIdEdit] = useState(false)
   const [previewOpen, setPreviewOpen] = useState(false)
   const [previewImage, setPreviewImage] = useState('')
+  const [totalCount, setTotalCount] = useState(0)
+  const [pageSize, setPageSize] = useState(10)
+  const [currentPage, setCurrentPage] = useState(1)
 
   const getStatusTag = (status) => {
     const tagStyle = {
@@ -151,13 +155,20 @@ const AddProperty = () => {
   }
 
   useEffect(() => {
-    getPropertyListings()
+    getPropertyListings({ page: 1, per_page: pageSize })
   }, [])
 
-  const getPropertyListings = async () => {
-    const res = await propertiesService.getPropertyListings()
-    if (res.data) {
-      setPropertyListing(res.data.properties)
+  const getPropertyListings = async (requestObj) => {
+    setLoading(true)
+    try {
+      const res = await propertiesService.getMyListings(requestObj)
+      if (res.success) {
+        setPropertyListing(res.data.properties)
+        setTotalCount(res.data.total_count)
+      }
+    } catch (error) {
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -243,6 +254,7 @@ const AddProperty = () => {
             form.resetFields()
             handleAddPropertyModalClose()
             setAddProperyModalCurrentStep(0)
+            getPropertyListings({ page: currentPage, per_page: pageSize })
           }
         }
         setLoading(false)
@@ -271,11 +283,21 @@ const AddProperty = () => {
             form.resetFields()
             handleAddPropertyModalClose()
             setAddProperyModalCurrentStep(0)
+            getPropertyListings({ page: currentPage, per_page: pageSize })
+          } else {
+            notification.error({
+              message: 'Action Failed',
+              description: uploadRes.message,
+            })
           }
+        } else {
+          notification.error({
+            message: 'Action Failed',
+            description: res.message,
+          })
         }
         setLoading(false)
       }
-      getPropertyListings()
     })
   }
 
@@ -330,6 +352,17 @@ const AddProperty = () => {
     }
   }
 
+  const handlePageChange = (page, newPageSize) => {
+    if (newPageSize !== pageSize) {
+      setPageSize(newPageSize)
+      setCurrentPage(1)
+      getPropertyListings({ page: 1, per_page: newPageSize })
+    } else {
+      setCurrentPage(page)
+      getPropertyListings({ page, per_page: pageSize })
+    }
+  }
+
   return (
     <div>
       <>
@@ -379,7 +412,11 @@ const AddProperty = () => {
             ),
           ]}
         >
-          <Spin spinning={isLoading} indicator={<LoadingOutlined spin />}>
+          <Spin
+            spinning={isLoading}
+            indicator={<LoadingOutlined spin />}
+            size="large"
+          >
             <ScrollablePageContent>
               <br />
               <Alert message={addPropertyModalDescription} type="warning" />
@@ -857,171 +894,194 @@ const AddProperty = () => {
             minHeight: '100vh', // Ensure it covers the entire viewport height
           }}
         >
-          {propertyListing.length === 0 && (
-            <Empty description="No properties found" />
-          )}
-          {propertyListing.length !== 0 && (
-            <List grid={{ gutter: 20, column: 1 }}>
-              {propertyListing.map((item) => {
-                return (
-                  <List.Item>
-                    <div
-                      class="glass"
-                      style={{
-                        padding: '10px',
-                        display: 'flex',
-                        flexDirection: 'row',
-                        flexWrap: 'wrap',
-                        justifyContent: 'space-between',
-                      }}
-                    >
-                      {/* Property Image Carousel */}
-                      <Carousel
-                        arrows={true}
+          <Spin
+            spinning={isLoading}
+            indicator={<LoadingOutlined spin />}
+            size="large"
+          >
+            {propertyListing.length === 0 && (
+              <Empty description="No properties found" />
+            )}
+            {propertyListing.length !== 0 && (
+              <List grid={{ gutter: 20, column: 1 }}>
+                {propertyListing.map((item) => {
+                  return (
+                    <List.Item>
+                      <div
+                        class="glass"
                         style={{
-                          width: '450px',
-                          height: '300px',
-                          padding: '0',
+                          padding: '10px',
+                          display: 'flex',
+                          flexDirection: 'row',
+                          flexWrap: 'wrap',
+                          justifyContent: 'space-between',
                         }}
                       >
-                        {item.images && item.images.length > 0 ? (
-                          item.images.map((image, index) => (
-                            <div key={index}>
+                        {/* Property Image Carousel */}
+                        <Carousel
+                          arrows={true}
+                          style={{
+                            width: '450px',
+                            height: '300px',
+                            padding: '0',
+                          }}
+                        >
+                          {item.images && item.images.length > 0 ? (
+                            item.images.map((image, index) => (
+                              <div key={index}>
+                                <img
+                                  src={image.url}
+                                  alt={`Property image ${index + 1}`}
+                                  style={{
+                                    width: '450px',
+                                    height: '300px',
+                                    objectFit: 'cover', // Ensures the image scales nicely
+                                  }}
+                                />
+                              </div>
+                            ))
+                          ) : (
+                            <div>
                               <img
-                                src={image.url}
-                                alt={`Property image ${index + 1}`}
+                                src="https://via.placeholder.com/300x200"
+                                alt="Placeholder"
                                 style={{
                                   width: '450px',
                                   height: '300px',
-                                  objectFit: 'cover', // Ensures the image scales nicely
                                 }}
                               />
                             </div>
-                          ))
-                        ) : (
-                          <div>
-                            <img
-                              src="https://via.placeholder.com/300x200"
-                              alt="Placeholder"
-                              style={{
-                                width: '450px',
-                                height: '300px',
-                              }}
-                            />
+                          )}
+                        </Carousel>
+                        {/* Property Details */}
+                        <div style={{ flex: 1, marginLeft: '20px' }}>
+                          <div
+                            style={{
+                              display: 'flex',
+                              justifyContent: 'space-between',
+                            }}
+                          >
+                            {/* Rent and Title */}
+                            <Text strong style={{ fontSize: '24px' }}>
+                              ${item.rent}/month
+                            </Text>
+
+                            {getStatusTag(item.status_verification)}
                           </div>
-                        )}
-                      </Carousel>
-                      {/* Property Details */}
-                      <div style={{ flex: 1, marginLeft: '20px' }}>
-                        <div
-                          style={{
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                          }}
-                        >
-                          {/* Rent and Title */}
-                          <Text strong style={{ fontSize: '24px' }}>
-                            ${item.rent}/month
-                          </Text>
 
-                          {getStatusTag(item.status_verification)}
-                        </div>
+                          {/* Address */}
+                          <div style={{ marginTop: '10px' }}>
+                            <Text
+                              style={{
+                                fontSize: '15px',
+                                display: 'block',
+                              }}
+                            >
+                              {item.title} 📍 {item.address.street_address},{' '}
+                              {item.address.city}, {item.address.state},{' '}
+                              {item.address.zip_code}
+                            </Text>
+                          </div>
 
-                        {/* Address */}
-                        <div style={{ marginTop: '10px' }}>
-                          <Text
+                          {/* Bedrooms and Bathrooms */}
+                          <div style={{ marginTop: '10px' }}>
+                            <Text
+                              style={{
+                                fontSize: '15px',
+                                display: 'block',
+                              }}
+                            >
+                              🛏️ {item.details.bedrooms} bd • 🛁{' '}
+                              {item.details.bathrooms} ba
+                            </Text>
+                          </div>
+
+                          {/* Description */}
+                          <div style={{ marginTop: '10px' }}>
+                            <Text style={{ fontSize: '15px' }}>
+                              {item.details.description ||
+                                'No Description Available'}
+                            </Text>
+                          </div>
+
+                          {/* Action Buttons */}
+                          <div
                             style={{
-                              fontSize: '15px',
-                              display: 'block',
+                              marginTop: '15px',
+                              display: 'flex',
+                              gap: '10px',
                             }}
                           >
-                            {item.title} 📍 {item.address.street_address},{' '}
-                            {item.address.city}, {item.address.state},{' '}
-                            {item.address.zip_code}
-                          </Text>
-                        </div>
-
-                        {/* Bedrooms and Bathrooms */}
-                        <div style={{ marginTop: '10px' }}>
-                          <Text
-                            style={{
-                              fontSize: '15px',
-                              display: 'block',
-                            }}
-                          >
-                            🛏️ {item.details.bedrooms} bd • 🛁{' '}
-                            {item.details.bathrooms} ba
-                          </Text>
-                        </div>
-
-                        {/* Description */}
-                        <div style={{ marginTop: '10px' }}>
-                          <Text style={{ fontSize: '15px' }}>
-                            {item.details.description ||
-                              'No Description Available'}
-                          </Text>
-                        </div>
-
-                        {/* Action Buttons */}
-                        <div
-                          style={{
-                            marginTop: '15px',
-                            display: 'flex',
-                            gap: '10px',
-                          }}
-                        >
-                          <Tooltip
-                            title={
-                              item.status_verification ===
-                              STATUS_VERIFICATION_PROPERTY_SUBMITTED
-                                ? 'You cannot edit this property because it is submitted for verification.'
-                                : item.status_verification ===
-                                  STATUS_VERIFICATION_PROPERTY_VERIFIED
-                                ? 'You can only edit select fields of a verified property.'
-                                : ''
-                            }
-                          >
-                            <Button
-                              icon={<EditOutlined />}
-                              disabled={
+                            <Tooltip
+                              title={
                                 item.status_verification ===
                                 STATUS_VERIFICATION_PROPERTY_SUBMITTED
+                                  ? 'You cannot edit this property because it is submitted for verification.'
+                                  : item.status_verification ===
+                                    STATUS_VERIFICATION_PROPERTY_VERIFIED
+                                  ? 'You can only edit select fields of a verified property.'
+                                  : ''
                               }
-                              onClick={() => {
-                                setInitialValues(item)
-                                handleAddPropertyModalOpen(true, item)
+                            >
+                              <Button
+                                icon={<EditOutlined />}
+                                disabled={
+                                  item.status_verification ===
+                                  STATUS_VERIFICATION_PROPERTY_SUBMITTED
+                                }
+                                onClick={() => {
+                                  setInitialValues(item)
+                                  handleAddPropertyModalOpen(true, item)
+                                }}
+                              >
+                                Edit
+                              </Button>
+                            </Tooltip>
+                            <Button
+                              icon={<DeleteOutlined />}
+                              danger
+                              onClick={() => handleRemoveClick(item)}
+                              style={{
+                                borderColor: '#ff4d4f',
                               }}
                             >
-                              Edit
+                              Remove
                             </Button>
-                          </Tooltip>
-                          <Button
-                            icon={<DeleteOutlined />}
-                            danger
-                            onClick={() => handleRemoveClick(item)}
-                            style={{
-                              borderColor: '#ff4d4f',
-                            }}
-                          >
-                            Remove
-                          </Button>
-                          {item.status_verification ===
-                            STATUS_VERIFICATION_PROPERTY_NOT_SUBMITTED && (
-                            <Button
-                              onClick={() =>
-                                handleSubmitForVerification(item.id)
-                              }
-                            >
-                              Submit for Verification
-                            </Button>
-                          )}
+                            {item.status_verification ===
+                              STATUS_VERIFICATION_PROPERTY_NOT_SUBMITTED && (
+                              <Button
+                                onClick={() =>
+                                  handleSubmitForVerification(item.id)
+                                }
+                              >
+                                Submit for Verification
+                              </Button>
+                            )}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </List.Item>
-                )
-              })}
-            </List>
+                    </List.Item>
+                  )
+                })}
+              </List>
+            )}
+          </Spin>
+
+          {propertyListing.length > 0 && (
+            <Row justify="end">
+              <Col>
+                <Pagination
+                  current={currentPage}
+                  total={totalCount}
+                  pageSize={pageSize}
+                  onChange={(page, pageSize) =>
+                    handlePageChange(page, pageSize)
+                  }
+                  pageSizeOptions={[10, 30, 50, 100]}
+                  showSizeChanger={true}
+                />
+              </Col>
+            </Row>
           )}
         </Layout>
       </>
