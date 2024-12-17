@@ -6,7 +6,6 @@ export default {
   listPropertyApi: async function (requestObj) {
     try {
       const response = api.post(API_URLS?.list_property_api, requestObj)
-
       return response
     } catch (error) {
       return error.data
@@ -15,7 +14,6 @@ export default {
   updatePropertyApi: async (requestObj) => {
     try {
       const response = api.post(API_URLS?.update_property_api, requestObj)
-
       return response
     } catch (error) {
       return error.data
@@ -41,6 +39,87 @@ export default {
     try {
       const response = await api.get(API_URLS?.get_property_listing_api)
       return response
+    } catch (error) {
+      return error.data
+    }
+  },
+  getAllPropertyListings: async () => {
+    try {
+      const response = await api.get(API_URLS?.get_all_property_listing_api)
+      return response
+    } catch (error) {
+      return error.data
+    }
+  },
+  submitPropertyForVerification: async (propertyId) => {
+    try {
+      const response = await api.post(
+        API_URLS?.submit_property_verification_api,
+        {
+          property_id: propertyId,
+        }
+      )
+      return response
+    } catch (error) {
+      return error.data
+    }
+  },
+  searchProperties: async (requestObj) => {
+    try {
+      const response = await api.get(API_URLS.search_properties_api, {
+        params: {
+          location: requestObj.location,
+          radius: requestObj.radius,
+          min_rent: requestObj.min_rent,
+          max_rent: requestObj.max_rent,
+          bathrooms: requestObj.bathrooms,
+          bedrooms: requestObj.bedrooms,
+          property_type: requestObj.property_type,
+          page: requestObj.page,
+          per_page: requestObj.per_page,
+          sort_by: requestObj.sort_by,
+        },
+      })
+      return response
+    } catch (error) {
+      return error.data
+    }
+  },
+  addToWishlist: async (requestObj) => {
+    try {
+      const response = await api.post(API_URLS?.wishlist_api, requestObj)
+      return response
+    } catch (error) {
+      return error.data
+    }
+  },
+  validateAddress: async (requestObj) => {
+    try {
+      return await api.post(API_URLS?.validate_address, requestObj)
+    } catch (error) {
+      return error.data
+    }
+  },
+  getWishlistedProperties: async (requestObj) => {
+    try {
+      return await api.get(API_URLS?.wishlist_api, {
+        params: {
+          page: requestObj.page,
+          per_page: requestObj.per_page,
+        },
+      })
+    } catch (error) {
+      return error.data
+    }
+  },
+  getMyListings: async (requestObj) => {
+    try {
+      return await api.get(API_URLS?.my_listings_api, {
+        params: {
+          page: requestObj.page,
+          per_page: requestObj.per_page,
+        },
+      })
     } catch (error) {
       return error.data
     }

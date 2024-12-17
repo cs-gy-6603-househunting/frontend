@@ -1,21 +1,12 @@
 import { Modal } from 'antd'
 import { useSelector } from 'react-redux'
 import { UserRoles } from 'src/utils/enum'
-import { Alert } from 'antd'
-import { LesseProfileInfoMessage } from './constants'
 import './index.less'
 import LesseeView from './LesseeView'
+import LessorView from './LessorView'
 
 const Profile = ({ isProfileOpen, onClose }) => {
   const user = useSelector((state) => state.auth.user)
-
-  const getLessorView = () => {
-    return (
-      <>
-        <Alert description={LesseProfileInfoMessage} type="info" />
-      </>
-    )
-  }
 
   return (
     <Modal
@@ -29,7 +20,11 @@ const Profile = ({ isProfileOpen, onClose }) => {
       maskClosable={false}
       destroyOnClose={true}
     >
-      {user.role === UserRoles.Lessee ? <LesseeView /> : getLessorView()}
+      {user.role === UserRoles.Lessee ? (
+        <LesseeView user={user} />
+      ) : (
+        <LessorView user={user} />
+      )}
     </Modal>
   )
 }

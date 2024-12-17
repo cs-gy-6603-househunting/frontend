@@ -1,18 +1,12 @@
 import { Button, Input, Modal } from 'antd'
 import { Form } from 'antd'
-import { TitleContainer } from './styles'
-import { Link } from 'react-router-dom'
-import { CTAS, FlexEnd, FlexLinear } from 'src/global-styles/utils'
+import { FlexEnd } from 'src/global-styles/utils'
 import { useAuth } from 'src/components/AuthProvider'
 import { useForm } from 'antd/es/form/Form'
 import { useDispatch } from 'react-redux'
 import { saveUserInfo } from 'src/utils/redux/authSlice'
 import { authenticateUser } from 'src/apis/authenticate'
-import { MOCK_USER_LOGIN } from './__test__/constants'
 import { useNavigate } from 'react-router-dom'
-import { useState } from 'react'
-import { verificationCodeValidation } from 'src/utils/regex'
-import EmailVerification from 'src/components/Modals/EmailVerification'
 import { CUSTOM_STATUS } from 'src/utils/enum'
 import { App } from 'antd'
 
@@ -77,7 +71,7 @@ const LoginForm = () => {
         >
           <Input.Password placeholder="Your Password" />
         </Form.Item>
-        <Link>Forgot Password?</Link>
+        {/* <Link>Forgot Password?</Link> */}
         <Form.Item>
           <FlexEnd>
             <Button type="primary" htmlType="submit">

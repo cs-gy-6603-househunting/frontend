@@ -2,12 +2,12 @@ import styled from 'styled-components'
 
 export const verticalFlex = {
   display: 'flex',
-  'flex-direction': 'column',
+  flexDirection: 'column', // Correct camel case
 }
 
 export const horizontalFlex = {
   display: 'flex',
-  'flex-direction': 'row',
+  flexDirection: 'row', // Correct camel case
 }
 
 export const FlexEnd = styled.div`
@@ -16,7 +16,9 @@ export const FlexEnd = styled.div`
 `
 
 export const FlexLinear = styled.div`
-  ${horizontalFlex}
+  display: flex;
+  flex-direction: row;
+  align-items: center;
 `
 
 export const CTAS = {
@@ -28,4 +30,9 @@ export const ScrollablePageContent = styled.div`
   min-height: 25vh;
   overflow-y: auto;
   overflow-x: hidden;
+  padding: 20px; /* Adds padding for scrollable content */
+  background: rgba(255, 255, 255, 0.8); /* Subtle white background */
+  backdrop-filter: blur(10px);
+  border-radius: 12px; /* Rounded corners */
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1); /* Light shadow for elevation */
 `

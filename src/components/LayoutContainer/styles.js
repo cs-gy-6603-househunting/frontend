@@ -3,7 +3,7 @@ import styled from 'styled-components'
 
 export const ProfileContainer = styled.div`
   cursor: pointer;
-  color: rgba(255, 255, 255, 0.7);
+  color: rgba(0, 0, 0, 0.7);
 `
 
 export const ProfileInfoContainer = styled.div`
