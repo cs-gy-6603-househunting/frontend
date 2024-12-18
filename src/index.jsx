@@ -8,13 +8,7 @@ import './index.css'
 
 createRoot(document.getElementById('root')).render(
   <ConfigProvider
-    theme={{
-      token: {
-        fontFamily: 'poppins',
-        colorPrimary: '#DE7272',
-        colorLink: '#DE7272',
-      },
-    }}
+    
   >
     <Provider store={store}>
       <BrowserRouter>

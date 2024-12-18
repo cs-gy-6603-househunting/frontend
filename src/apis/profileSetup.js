@@ -12,3 +12,11 @@ export const saveLesseeProfile = async (userId, requestObj) => {
 export const getLesseeProfile = async (userId) => {
   return await api.get(`${API_URLS.lessee_profile}/${userId}/`)
 }
+
+export const saveLessorProfile = async (userId, requestObj) => {
+  return await api.put(`${API_URLS.lessor_profile}/${userId}/`, requestObj)
+}
+
+export const getLessorProfile = async (userId) => {
+  return await api.get(`${API_URLS.lessor_profile}/${userId}/`)
+}

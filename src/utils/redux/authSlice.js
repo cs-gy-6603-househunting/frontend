@@ -20,7 +20,7 @@ const authSlice = createSlice({
       state.refreshToken = refreshToken
     },
     logOut: (state) => {
-      state.user = { role: -1 }
+      state.user = { role: -1, email: '' }
       state.token = null
       state.refreshToken = null
     },
