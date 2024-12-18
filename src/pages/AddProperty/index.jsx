@@ -39,6 +39,7 @@ import Icon, {
   CheckCircleOutlined,
   CloseCircleOutlined,
   SyncOutlined,
+  EyeOutlined,
 } from '@ant-design/icons'
 
 import { useEffect } from 'react'
@@ -879,7 +880,7 @@ const AddProperty = () => {
         <Row justify="space-between">
           <Col>
             <Title level={3} style={{ margin: 0, fontWeight: 'bold' }}>
-              Your Properties
+              {`Your Properties`}
             </Title>
           </Col>
           <Col>
@@ -986,7 +987,7 @@ const AddProperty = () => {
                                 display: 'block',
                               }}
                             >
-                              {item.title} 📍 {item.address.street_address},{' '}
+                              {item.title} 📝 {item.address.street_address},{' '}
                               {item.address.city}, {item.address.state},{' '}
                               {item.address.zip_code}
                             </Text>
@@ -1000,7 +1001,7 @@ const AddProperty = () => {
                                 display: 'block',
                               }}
                             >
-                              🛏️ {item.details.bedrooms} bd • 🛁{' '}
+                              🛝︝ {item.details.bedrooms} bd • 🛝{' '}
                               {item.details.bathrooms} ba
                             </Text>
                           </div>
@@ -1068,7 +1069,7 @@ const AddProperty = () => {
                                   handleSubmitForVerification(item.id)
                                 }
                               >
-                                Submit for Verification
+                                {`Submit for Verification`}
                               </Button>
                             )}
                             <Button

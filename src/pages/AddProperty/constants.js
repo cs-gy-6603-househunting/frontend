@@ -6,7 +6,7 @@ export const steps = [
     content: 'First-content',
   },
   {
-    title: 'Amentities',
+    title: 'Amenities',
     content: 'Second-content',
   },
   {

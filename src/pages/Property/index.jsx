@@ -30,6 +30,8 @@ import {
   HeartOutlined,
   HeartFilled,
   ArrowLeftOutlined,
+  CheckCircleOutlined,
+  CloseCircleOutlined,
 } from '@ant-design/icons'
 
 import axios from 'axios'
@@ -45,8 +47,9 @@ const PropertyDetails = () => {
   const user = useSelector((state) => state.auth.user)
 
   const [property, setProperty] = useState(null)
-
   const [isModalVisible, setIsModalVisible] = useState(false)
+
+  const [isInWishlist, setIsInWishlist] = useState(false)
 
   const showModal = () => {
     setIsModalVisible(true)
@@ -67,6 +70,7 @@ const PropertyDetails = () => {
         const res = await propertiesService.getPropertyListing(requestObj)
         if (res.success) {
           setProperty(res.data)
+          setIsInWishlist(res?.data?.details?.is_wishlist)
         }
       } catch (error) {
       } finally {
@@ -77,7 +81,6 @@ const PropertyDetails = () => {
     fetchPropertyDetails({ property_id: property_id })
   }, [property_id])
 
-  const [isInWishlist, setIsInWishlist] = useState(false)
   const [aqi, setAqi] = useState(null)
 
   const modifyWishlistApi = async () => {
@@ -202,7 +205,9 @@ const PropertyDetails = () => {
                 icon={isInWishlist ? <HeartFilled /> : <HeartOutlined />}
                 onClick={toggleWishlist}
                 style={{ marginRight: '10px' }}
-              >{`Add to Wishlist`}</Button> */}
+              >
+                {isInWishlist ? `Added to Wishlist` : `Add to Wishlist`}
+              </Button>
               <Button type="default" onClick={contactOwner}>
                 {`Contact Owner`}
               </Button>
@@ -239,6 +244,9 @@ const PropertyDetails = () => {
               <Descriptions.Item label="Type">
                 {property?.details.property_type}
               </Descriptions.Item>
+              <Descriptions.Item label="Description">
+                {property?.description}
+              </Descriptions.Item>
               <Descriptions.Item label="Bedrooms">
                 {property?.details.bedrooms}
               </Descriptions.Item>
@@ -265,6 +273,74 @@ const PropertyDetails = () => {
 
         <Divider />
 
+        {/* Amenities */}
+        <Descriptions title="Amenities" bordered>
+          <Descriptions.Item label="Air Conditioning">
+            {property?.amenities?.air_conditioning ? (
+              <CheckCircleOutlined style={{ color: 'green' }} />
+            ) : (
+              <CloseCircleOutlined style={{ color: 'red' }} />
+            )}
+          </Descriptions.Item>
+          <Descriptions.Item label="Parking">
+            {property?.amenities?.parking ? (
+              <CheckCircleOutlined style={{ color: 'green' }} />
+            ) : (
+              <CloseCircleOutlined style={{ color: 'red' }} />
+            )}
+          </Descriptions.Item>
+          <Descriptions.Item label="Dishwasher">
+            {property?.amenities?.dishwasher ? (
+              <CheckCircleOutlined style={{ color: 'green' }} />
+            ) : (
+              <CloseCircleOutlined style={{ color: 'red' }} />
+            )}
+          </Descriptions.Item>
+          <Descriptions.Item label="Heating">
+            {property?.amenities?.heating ? (
+              <CheckCircleOutlined style={{ color: 'green' }} />
+            ) : (
+              <CloseCircleOutlined style={{ color: 'red' }} />
+            )}
+          </Descriptions.Item>
+          <Descriptions.Item label="Gym">
+            {property?.amenities?.gym ? (
+              <CheckCircleOutlined style={{ color: 'green' }} />
+            ) : (
+              <CloseCircleOutlined style={{ color: 'red' }} />
+            )}
+          </Descriptions.Item>
+          <Descriptions.Item label="Refrigerator">
+            {property?.amenities?.refrigerator ? (
+              <CheckCircleOutlined style={{ color: 'green' }} />
+            ) : (
+              <CloseCircleOutlined style={{ color: 'red' }} />
+            )}
+          </Descriptions.Item>
+          <Descriptions.Item label="Laundry">
+            {property?.amenities?.laundry ? (
+              <CheckCircleOutlined style={{ color: 'green' }} />
+            ) : (
+              <CloseCircleOutlined style={{ color: 'red' }} />
+            )}
+          </Descriptions.Item>
+          <Descriptions.Item label="Swimming Pool">
+            {property?.amenities?.swimming_pool ? (
+              <CheckCircleOutlined style={{ color: 'green' }} />
+            ) : (
+              <CloseCircleOutlined style={{ color: 'red' }} />
+            )}
+          </Descriptions.Item>
+          <Descriptions.Item label="Microwave">
+            {property?.amenities?.microwave ? (
+              <CheckCircleOutlined style={{ color: 'green' }} />
+            ) : (
+              <CloseCircleOutlined style={{ color: 'red' }} />
+            )}
+          </Descriptions.Item>
+        </Descriptions>
+        <Divider />
+
         {/* Points of Interest */}
         <Row gutter={[16, 16]}>
           <Col xs={24} md={12}>
@@ -277,7 +353,7 @@ const PropertyDetails = () => {
                   <List.Item key={item.id} onClick={() => setSelectedPoi(item)}>
                     <List.Item.Meta
                       title={item.poi_name}
-                      description={`Type: ${item.poi_type}, Ratings: ${item.poi_ratings} ⭐, Distance: ${item.distance}`}
+                      description={`Type: ${item.poi_type}, Ratings: ${item.poi_ratings} ⭝, Distance: ${item.distance}`}
                     />
                   </List.Item>
                 )}
@@ -293,6 +369,19 @@ const PropertyDetails = () => {
                   zoom={15}
                 >
                   {/* Add markers for each POI */}
+                  {property?.address && (
+                    <Marker
+                      position={{
+                        lat: property.address.latitude,
+                        lng: property.address.longitude,
+                      }}
+                      title="House"
+                      icon={{
+                        url: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png',
+                      }}
+                      onClick={() => setSelectedPoi(property?.address)}
+                    />
+                  )}
                   {property?.pois.map((poi) => (
                     <Marker
                       key={poi.id}
@@ -305,24 +394,26 @@ const PropertyDetails = () => {
                     />
                   ))}
                   {/* InfoWindow for selected POI */}
+
                   {selectedPoi && (
                     <InfoWindow
                       position={{
-                        lat: selectedPoi.latitude,
-                        lng: selectedPoi.longitude,
+                        lat: selectedPoi?.latitude,
+                        lng: selectedPoi?.longitude,
                       }}
                       onCloseClick={() => setSelectedPoi(null)}
                     >
                       <div>
-                        <h4>{selectedPoi.poi_name}</h4>
+                        <h4>{selectedPoi?.poi_name}</h4>
                         <p>
-                          <strong>Type:</strong> {selectedPoi.poi_type}
+                          <strong>Type:</strong> {selectedPoi?.poi_type}
                         </p>
                         <p>
-                          <strong>Ratings:</strong> {selectedPoi.poi_ratings} ⭐
+                          <strong>Ratings:</strong> {selectedPoi?.poi_ratings}{' '}
+                          ⭝
                         </p>
                         <p>
-                          <strong>Distance:</strong> {selectedPoi.distance}
+                          <strong>Distance:</strong> {selectedPoi?.distance}
                         </p>
                       </div>
                     </InfoWindow>
