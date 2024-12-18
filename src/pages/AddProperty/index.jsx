@@ -31,7 +31,9 @@ import Icon, {
   PictureOutlined,
   LoadingOutlined,
   ReloadOutlined,
+  AuditOutlined,
   EditOutlined,
+  ExportOutlined,
   DeleteOutlined,
   ExclamationCircleOutlined,
   CheckCircleOutlined,
@@ -336,21 +338,25 @@ const AddProperty = () => {
         propertyId
       )
       if (response?.success) {
+        // Success notification
         notification.success({
-          message: 'Success',
-          description: response.message,
+          message: 'Property Submitted',
+          description:
+            'Property has been successfully submitted for verification',
         })
-        // Refresh property list or perform other UI updates
+
+        // Immediately refresh the property listings to update the status
+        getPropertyListings({ page: currentPage, per_page: pageSize })
       } else {
         notification.error({
-          message: 'Error',
+          message: 'Submission Failed',
           description: response?.error || 'Something went wrong!',
         })
       }
     } catch (error) {
       notification.error({
         message: 'Error',
-        description: 'An unexpected error occurred!',
+        description: 'An unexpected error occurred during submission',
       })
     }
   }
@@ -919,9 +925,6 @@ const AddProperty = () => {
                           flexWrap: 'wrap',
                           justifyContent: 'space-between',
                         }}
-                        onClick={() => {
-                          navigate(`/property?id=${item?.id}`)
-                        }}
                       >
                         {/* Property Image Carousel */}
                         <Carousel
@@ -1043,6 +1046,31 @@ const AddProperty = () => {
                                 Edit
                               </Button>
                             </Tooltip>
+                            {item.status_verification ===
+                              STATUS_VERIFICATION_PROPERTY_NOT_SUBMITTED && (
+                              <Button
+                                icon={<ExportOutlined />}
+                                onClick={() => {
+                                  window.open(
+                                    `/property?id=${item?.id}`,
+                                    '_blank'
+                                  )
+                                }}
+                              >
+                                View Property Page
+                              </Button>
+                            )}
+                            {item.status_verification ===
+                              STATUS_VERIFICATION_PROPERTY_NOT_SUBMITTED && (
+                              <Button
+                                icon={<AuditOutlined />}
+                                onClick={() =>
+                                  handleSubmitForVerification(item.id)
+                                }
+                              >
+                                Submit for Verification
+                              </Button>
+                            )}
                             <Button
                               icon={<DeleteOutlined />}
                               danger
@@ -1053,16 +1081,6 @@ const AddProperty = () => {
                             >
                               Remove
                             </Button>
-                            {item.status_verification ===
-                              STATUS_VERIFICATION_PROPERTY_NOT_SUBMITTED && (
-                              <Button
-                                onClick={() =>
-                                  handleSubmitForVerification(item.id)
-                                }
-                              >
-                                Submit for Verification
-                              </Button>
-                            )}
                           </div>
                         </div>
                       </div>

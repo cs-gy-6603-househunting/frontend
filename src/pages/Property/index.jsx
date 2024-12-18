@@ -197,12 +197,12 @@ const PropertyDetails = () => {
           </Col>
           {user?.role == 2 ? (
             <Col>
-              <Button
+              {/* <Button
                 danger
                 icon={isInWishlist ? <HeartFilled /> : <HeartOutlined />}
                 onClick={toggleWishlist}
                 style={{ marginRight: '10px' }}
-              >{`Add to Wishlist`}</Button>
+              >{`Add to Wishlist`}</Button> */}
               <Button type="default" onClick={contactOwner}>
                 {`Contact Owner`}
               </Button>

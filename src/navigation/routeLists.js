@@ -1,5 +1,7 @@
-import * as AllNavigation from 'src/utils/routes'
-import * as AllPages from 'src/pages'
+import { useSelector } from 'react-redux';
+import * as AllNavigation from 'src/utils/routes';
+import * as AllPages from 'src/pages';
+import { UserRoles } from 'src/utils/enum';
 
 export const openRouteList = [
   {
@@ -26,11 +28,6 @@ export const routeLists = [
     key: 'root',
     component: AllPages.Dashboard,
     path: AllNavigation.ROOT,
-  },
-  {
-    key: 'home',
-    component: AllPages.Dashboard,
-    path: AllNavigation.HOME,
   },
   {
     key: 'property',

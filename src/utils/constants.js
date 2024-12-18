@@ -10,12 +10,13 @@ export const API_URLS = {
   request_new_verify_link: '/api/auth/verify/generatenew/',
   lessee_profile: '/api/auth/lessee_setup',
   lessor_profile: '/api/auth/lessor_setup',
-  get_all_property_listing_api: '/api/properties/get-all-properties',
+  get_all_property_listing_api: '/api/properties/',
   submit_property_verification_api: 'api/properties/submit-verification/',
   search_properties_api: 'api/properties/search/',
   wishlist_api: 'api/properties/wishlist/',
   my_listings_api: 'api/properties/my-listings/',
-  get_property_listing_api: '/api/properties/'
+  get_property_listing_api: '/api/properties/',
+  update_property_verification_status_api: '/api/properties/verify/',
 }
 
 export const AUTH_NOT_REQUIRED_APIS = [

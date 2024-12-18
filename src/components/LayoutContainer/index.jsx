@@ -10,6 +10,7 @@ import { useAuth } from '../AuthProvider'
 import { clearAuthOnLogout } from 'src/utils/storage'
 import Profile from '../Modals/Profile'
 import { useState } from 'react'
+import { UserRoles } from 'src/utils/enum'
 
 const { Header, Content, Footer } = Layout
 const { Text } = Typography
@@ -78,24 +79,23 @@ const LayoutContainer = () => {
   }
 
   const getMenuItems = () => {
-    if (user.role === 4) {
+    if (user.role === UserRoles.VerificationSupport) {
       return [
-        <Menu.Item key="lessor-verifications">{`Lessor Verifications`}</Menu.Item>,
+        // <Menu.Item key="lessor-verifications">{`Lessor Verifications`}</Menu.Item>,
         <Menu.Item key="property-verifications">{`Property Verifications`}</Menu.Item>,
       ]
-    } else if (user.role === 3) {
+    } else if (user.role === UserRoles.Lessor) {
       return [
-        <Menu.Item key="home">{`Home`}</Menu.Item>,
         <Menu.Item key="properties">{`Manage Properties`}</Menu.Item>,
         <Menu.Item key="about">{`About Us`}</Menu.Item>,
-        <Menu.Item key="contact">{`Contact`}</Menu.Item>,
+        // <Menu.Item key="contact">{`Contact`}</Menu.Item>,
       ]
     } else {
       return [
         <Menu.Item key="search-properties">{`Search Properties`}</Menu.Item>,
         <Menu.Item key="wishlist">{`Wishlist`}</Menu.Item>,
         <Menu.Item key="about">{`About Us`}</Menu.Item>,
-        <Menu.Item key="contact">{`Contact`}</Menu.Item>,
+        // <Menu.Item key="contact">{`Contact`}</Menu.Item>,
       ]
     }
   }
