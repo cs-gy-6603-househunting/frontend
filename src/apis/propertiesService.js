@@ -131,5 +131,16 @@ export default {
     } catch (error) {
       return error.data
     }
-  }
+  },
+  updatePropertyVerificationStatus: async ({ property_id, action }) => {
+    try {
+      const response = await api.post(API_URLS?.update_property_verification_status_api, {
+        property_id,
+        action
+      })
+      return response
+    } catch (error) {
+      return error.data
+    }
+  },
 }

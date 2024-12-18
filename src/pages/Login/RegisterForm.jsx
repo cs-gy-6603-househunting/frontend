@@ -1,4 +1,5 @@
-import { Button, Input, Radio } from 'antd'
+import { Modal, Button, Input, Radio, Space, Alert, Typography } from 'antd'
+import { MailTwoTone } from '@ant-design/icons'
 import { Form } from 'antd'
 import { FlexEnd } from 'src/global-styles/utils'
 import { Select } from 'antd'
@@ -8,16 +9,49 @@ import { MOCK_USER_SIGNUP } from './__test__/constants'
 import { phoneNumberValidation } from 'src/utils/regex'
 import { UserRoles } from 'src/utils/enum'
 import { notification } from 'antd'
+import { useState } from 'react'
+
+const { Text, Paragraph } = Typography
 
 const RegisterForm = ({ onChange }) => {
   const [form] = useForm()
   const [api, contextHolder] = notification.useNotification()
+  const [isEmailVerificationModalVisible, setIsEmailVerificationModalVisible] =
+    useState(false)
 
   const openNotification = (description) => {
     api.error({
       message: 'Registration Failed',
       description: description,
     })
+  }
+
+  const EmailVerificationModal = ({ visible, onClose }) => {
+    return (
+      <Modal
+        icon={<MailTwoTone />}
+        title="Verify Your Email"
+        open={visible}
+        onCancel={onClose}
+        footer={[
+          <Button key="close" onClick={onClose}>
+            Close
+          </Button>,
+        ]}
+      >
+        <Space direction="vertical" size="middle">
+          <Paragraph>
+            We've sent a verification email to you. Please check your inbox and
+            follow these steps:
+          </Paragraph>
+          <ul>
+            <li>Check your email (including spam folder)</li>
+            <li>Click on the verification link</li>
+            <li>Sign in</li>
+          </ul>
+        </Space>
+      </Modal>
+    )
   }
 
   const onFinish = () => {
@@ -44,8 +78,8 @@ const RegisterForm = ({ onChange }) => {
           openNotification(error.non_field_errors[0])
         }
       } else if (res) {
-        onChange('login')
         form.resetFields()
+        setIsEmailVerificationModalVisible(true)
       }
     })
   }
@@ -122,6 +156,13 @@ const RegisterForm = ({ onChange }) => {
             </Button>
           </FlexEnd>
         </Form.Item>
+        <EmailVerificationModal
+          visible={isEmailVerificationModalVisible}
+          onClose={() => {
+            setIsEmailVerificationModalVisible(false)
+            onChange('login')
+          }}
+        />
       </Form>
     </>
   )

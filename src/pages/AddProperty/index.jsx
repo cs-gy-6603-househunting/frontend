@@ -31,12 +31,15 @@ import Icon, {
   PictureOutlined,
   LoadingOutlined,
   ReloadOutlined,
+  AuditOutlined,
   EditOutlined,
+  ExportOutlined,
   DeleteOutlined,
   ExclamationCircleOutlined,
   CheckCircleOutlined,
   CloseCircleOutlined,
   SyncOutlined,
+  EyeOutlined,
 } from '@ant-design/icons'
 
 import { useEffect } from 'react'
@@ -336,21 +339,25 @@ const AddProperty = () => {
         propertyId
       )
       if (response?.success) {
+        // Success notification
         notification.success({
-          message: 'Success',
-          description: response.message,
+          message: 'Property Submitted',
+          description:
+            'Property has been successfully submitted for verification',
         })
-        // Refresh property list or perform other UI updates
+
+        // Immediately refresh the property listings to update the status
+        getPropertyListings({ page: currentPage, per_page: pageSize })
       } else {
         notification.error({
-          message: 'Error',
+          message: 'Submission Failed',
           description: response?.error || 'Something went wrong!',
         })
       }
     } catch (error) {
       notification.error({
         message: 'Error',
-        description: 'An unexpected error occurred!',
+        description: 'An unexpected error occurred during submission',
       })
     }
   }
@@ -873,7 +880,7 @@ const AddProperty = () => {
         <Row justify="space-between">
           <Col>
             <Title level={3} style={{ margin: 0, fontWeight: 'bold' }}>
-              Your Properties
+              {`Your Properties`}
             </Title>
           </Col>
           <Col>
@@ -918,9 +925,6 @@ const AddProperty = () => {
                           flexDirection: 'row',
                           flexWrap: 'wrap',
                           justifyContent: 'space-between',
-                        }}
-                        onClick={() => {
-                          navigate(`/property?id=${item?.id}`)
                         }}
                       >
                         {/* Property Image Carousel */}
@@ -983,7 +987,7 @@ const AddProperty = () => {
                                 display: 'block',
                               }}
                             >
-                              {item.title} 📍 {item.address.street_address},{' '}
+                              {item.title} 📝 {item.address.street_address},{' '}
                               {item.address.city}, {item.address.state},{' '}
                               {item.address.zip_code}
                             </Text>
@@ -997,7 +1001,7 @@ const AddProperty = () => {
                                 display: 'block',
                               }}
                             >
-                              🛏️ {item.details.bedrooms} bd • 🛁{' '}
+                              🛝︝ {item.details.bedrooms} bd • 🛝{' '}
                               {item.details.bathrooms} ba
                             </Text>
                           </div>
@@ -1043,6 +1047,28 @@ const AddProperty = () => {
                                 Edit
                               </Button>
                             </Tooltip>
+                            {item.status_verification ===
+                              STATUS_VERIFICATION_PROPERTY_NOT_SUBMITTED && (
+                              <Button
+                                icon={<ExportOutlined />}
+                                onClick={() => {
+                                  navigate(`/property?id=${item?.id}`)
+                                }}
+                              >
+                                View Property Page
+                              </Button>
+                            )}
+                            {item.status_verification ===
+                              STATUS_VERIFICATION_PROPERTY_NOT_SUBMITTED && (
+                              <Button
+                                icon={<AuditOutlined />}
+                                onClick={() =>
+                                  handleSubmitForVerification(item.id)
+                                }
+                              >
+                                {`Submit for Verification`}
+                              </Button>
+                            )}
                             <Button
                               icon={<DeleteOutlined />}
                               danger
@@ -1053,16 +1079,6 @@ const AddProperty = () => {
                             >
                               Remove
                             </Button>
-                            {item.status_verification ===
-                              STATUS_VERIFICATION_PROPERTY_NOT_SUBMITTED && (
-                              <Button
-                                onClick={() =>
-                                  handleSubmitForVerification(item.id)
-                                }
-                              >
-                                Submit for Verification
-                              </Button>
-                            )}
                           </div>
                         </div>
                       </div>

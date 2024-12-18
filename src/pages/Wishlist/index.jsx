@@ -79,7 +79,8 @@ const Wishlist = () => {
   }
 
   const removeFromWishlist = async (property) => {
-    togglePropertyComparison(property)
+    // togglePropertyComparison(property)
+    setSelectedForComparison((prev) => prev.filter((p) => p.id !== property.id))
     const requestObj = {
       property_id: property.id,
       lessee_id: user.userId,
@@ -137,7 +138,7 @@ const Wishlist = () => {
   return (
     <Layout style={{ background: 'white', minHeight: '100vh' }}>
       <Header style={{ background: '#fff', padding: '0 20px' }}>
-        <Title level={3}>My Wishlist</Title>
+        <Title level={3}>{`My Wishlist`}</Title>
       </Header>
       <Content style={{ padding: '20px' }}>
         <Spin spinning={isLoading} indicator={<LoadingOutlined spin />}>
@@ -158,8 +159,9 @@ const Wishlist = () => {
                       width: '100%',
                       marginBottom: 16,
                     }}
-                    onClick={() => {
+                    onClick={(e) => {
                       navigate(`/property?id=${property?.id}`)
+                      e.stopPropagation()
                     }}
                   >
                     <Row gutter={16}>
@@ -213,6 +215,7 @@ const Wishlist = () => {
                               onChange={() =>
                                 togglePropertyComparison(property)
                               }
+                              onClick={(e) => e.stopPropagation()}
                             />
                             {selectedForComparison.some(
                               (p) => p.id === property.id
@@ -222,9 +225,12 @@ const Wishlist = () => {
                                 style={{
                                   marginLeft: '10px',
                                 }}
-                                onClick={() => showComparison()} // Example: Could show comparison directly
+                                onClick={(e) => {
+                                  showComparison()
+                                  e.stopPropagation()
+                                }} // Example: Could show comparison directly
                               >
-                                Compare Now
+                                {`Compare Now`}
                               </Button>
                             )}
                             <Button
@@ -237,7 +243,10 @@ const Wishlist = () => {
                                   }}
                                 />
                               }
-                              onClick={() => removeFromWishlist(property)}
+                              onClick={(e) => {
+                                removeFromWishlist(property)
+                                e.stopPropagation()
+                              }}
                             />
                           </div>
                         </div>
