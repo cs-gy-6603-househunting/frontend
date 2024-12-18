@@ -244,7 +244,7 @@ const PropertySearch = () => {
                 htmlType="submit"
                 icon={<SearchOutlined />}
               >
-                Search Properties
+                {`Search Properties`}
               </Button>
             </Form.Item>
           </Form>
@@ -268,8 +268,9 @@ const PropertySearch = () => {
                       width: '100%',
                       marginBottom: 16,
                     }}
-                    onClick={() => {
+                    onClick={(e) => {
                       navigate(`/property?id=${property?.id}`)
+                      e.stopPropagation()
                     }}
                   >
                     <Row gutter={16}>
@@ -327,7 +328,10 @@ const PropertySearch = () => {
                                 />
                               )
                             }
-                            onClick={() => toggleWishlist(property)}
+                            onClick={(e) => {
+                              toggleWishlist(property)
+                              e.stopPropagation()
+                            }}
                           />
                         </div>
                         <Text strong>{property.title}</Text>

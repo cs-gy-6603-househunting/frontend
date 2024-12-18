@@ -37,6 +37,7 @@ import Icon, {
   CheckCircleOutlined,
   CloseCircleOutlined,
   SyncOutlined,
+  EyeOutlined,
 } from '@ant-design/icons'
 
 import { useEffect } from 'react'
@@ -873,7 +874,7 @@ const AddProperty = () => {
         <Row justify="space-between">
           <Col>
             <Title level={3} style={{ margin: 0, fontWeight: 'bold' }}>
-              Your Properties
+              {`Your Properties`}
             </Title>
           </Col>
           <Col>
@@ -918,9 +919,6 @@ const AddProperty = () => {
                           flexDirection: 'row',
                           flexWrap: 'wrap',
                           justifyContent: 'space-between',
-                        }}
-                        onClick={() => {
-                          navigate(`/property?id=${item?.id}`)
                         }}
                       >
                         {/* Property Image Carousel */}
@@ -1051,7 +1049,7 @@ const AddProperty = () => {
                                 borderColor: '#ff4d4f',
                               }}
                             >
-                              Remove
+                              {`Remove`}
                             </Button>
                             {item.status_verification ===
                               STATUS_VERIFICATION_PROPERTY_NOT_SUBMITTED && (
@@ -1060,9 +1058,17 @@ const AddProperty = () => {
                                   handleSubmitForVerification(item.id)
                                 }
                               >
-                                Submit for Verification
+                                {`Submit for Verification`}
                               </Button>
                             )}
+                            <Button
+                              icon={<EyeOutlined />}
+                              onClick={() =>
+                                navigate(`/property?id=${item?.id}`)
+                              }
+                            >
+                              {`View Property`}
+                            </Button>
                           </div>
                         </div>
                       </div>
