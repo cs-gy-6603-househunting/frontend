@@ -39,7 +39,6 @@ import Icon, {
   CheckCircleOutlined,
   CloseCircleOutlined,
   SyncOutlined,
-  EyeOutlined,
 } from '@ant-design/icons'
 
 import { useEffect } from 'react'
@@ -161,15 +160,21 @@ const AddProperty = () => {
   }
 
   useEffect(() => {
-    getPropertyListings({ page: 1, per_page: pageSize })
-  }, [])
+    getPropertyListings({
+      page: 1,
+      per_page: pageSize,
+    })
+  }, [pageSize])
 
   const getPropertyListings = async (requestObj) => {
     setLoading(true)
     try {
       const res = await propertiesService.getMyListings(requestObj)
       if (res.success) {
-        setPropertyListing(res.data.properties)
+        const activeProperties = res.data.properties.filter(
+          (property) => !property.is_deleted
+        )
+        setPropertyListing(activeProperties)
         setTotalCount(res.data.total_count)
       }
     } catch (error) {
@@ -339,25 +344,21 @@ const AddProperty = () => {
         propertyId
       )
       if (response?.success) {
-        // Success notification
         notification.success({
-          message: 'Property Submitted',
-          description:
-            'Property has been successfully submitted for verification',
+          message: 'Success',
+          description: response.message,
         })
-
-        // Immediately refresh the property listings to update the status
         getPropertyListings({ page: currentPage, per_page: pageSize })
       } else {
         notification.error({
-          message: 'Submission Failed',
+          message: 'Error',
           description: response?.error || 'Something went wrong!',
         })
       }
     } catch (error) {
       notification.error({
         message: 'Error',
-        description: 'An unexpected error occurred during submission',
+        description: 'An unexpected error occurred!',
       })
     }
   }
@@ -371,6 +372,44 @@ const AddProperty = () => {
       setCurrentPage(page)
       getPropertyListings({ page, per_page: pageSize })
     }
+  }
+
+  const handleRemoveClick = async (item) => {
+    Modal.confirm({
+      title: 'Remove Property',
+      icon: <ExclamationCircleOutlined />,
+      content: 'Are you sure you want to remove this property?',
+      okText: 'Yes',
+      okType: 'danger',
+      cancelText: 'No',
+      async onOk() {
+        setLoading(true)
+        try {
+          const response = await propertiesService.deleteProperty(item.id)
+
+          if (response?.success) {
+            notification.success({
+              message: 'Property Removed',
+              description: 'Successfully removed property from listing',
+            })
+            getPropertyListings({ page: currentPage, per_page: pageSize })
+          } else {
+            notification.error({
+              message: 'Action Failed',
+              description: response?.message || 'Failed to remove property',
+            })
+          }
+        } catch (error) {
+          notification.error({
+            message: 'Action Failed',
+            description: 'An error occurred while removing the property',
+          })
+          console.error('Delete property error:', error)
+        } finally {
+          setLoading(false)
+        }
+      },
+    })
   }
 
   return (
@@ -880,7 +919,7 @@ const AddProperty = () => {
         <Row justify="space-between">
           <Col>
             <Title level={3} style={{ margin: 0, fontWeight: 'bold' }}>
-              {`Your Properties`}
+              Your Properties
             </Title>
           </Col>
           <Col>
@@ -987,7 +1026,7 @@ const AddProperty = () => {
                                 display: 'block',
                               }}
                             >
-                              {item.title} 📝 {item.address.street_address},{' '}
+                              {item.title} 📍 {item.address.street_address},{' '}
                               {item.address.city}, {item.address.state},{' '}
                               {item.address.zip_code}
                             </Text>
@@ -1001,7 +1040,7 @@ const AddProperty = () => {
                                 display: 'block',
                               }}
                             >
-                              🛝︝ {item.details.bedrooms} bd • 🛝{' '}
+                              🛏️ {item.details.bedrooms} bd • 🛁{' '}
                               {item.details.bathrooms} ba
                             </Text>
                           </div>
@@ -1048,11 +1087,14 @@ const AddProperty = () => {
                               </Button>
                             </Tooltip>
                             {item.status_verification ===
-                              STATUS_VERIFICATION_PROPERTY_NOT_SUBMITTED && (
+                              STATUS_VERIFICATION_PROPERTY_VERIFIED && (
                               <Button
                                 icon={<ExportOutlined />}
                                 onClick={() => {
-                                  navigate(`/property?id=${item?.id}`)
+                                  window.open(
+                                    `/property?id=${item?.id}`,
+                                    '_blank'
+                                  )
                                 }}
                               >
                                 View Property Page
@@ -1066,7 +1108,7 @@ const AddProperty = () => {
                                   handleSubmitForVerification(item.id)
                                 }
                               >
-                                {`Submit for Verification`}
+                                Submit for Verification
                               </Button>
                             )}
                             <Button
