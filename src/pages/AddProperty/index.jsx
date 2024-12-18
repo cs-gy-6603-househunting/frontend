@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import {
   Input,
   Button,
@@ -68,6 +69,8 @@ export const STATUS_VERIFICATION_PROPERTY_DENIED = 2
 export const STATUS_VERIFICATION_PROPERTY_VERIFIED = 3
 
 const AddProperty = () => {
+  const navigate = useNavigate()
+
   const [isAddPropertyModalOpen, setIsAddPropertyModalOpen] = useState(false)
 
   const [addProperyModalCurrentStep, setAddProperyModalCurrentStep] =
@@ -915,6 +918,9 @@ const AddProperty = () => {
                           flexDirection: 'row',
                           flexWrap: 'wrap',
                           justifyContent: 'space-between',
+                        }}
+                        onClick={() => {
+                          navigate(`/property?id=${item?.id}`)
                         }}
                       >
                         {/* Property Image Carousel */}

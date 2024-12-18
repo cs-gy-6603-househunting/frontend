@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import {
   Layout,
   Row,
@@ -37,6 +38,8 @@ const { Title, Text } = Typography
 const { Option } = Select
 
 const PropertySearch = () => {
+  const navigate = useNavigate()
+
   const [properties, setProperties] = useState([])
   const [totalCount, setTotalCount] = useState(0)
   const [pageSize, setPageSize] = useState(10)
@@ -132,7 +135,7 @@ const PropertySearch = () => {
   return (
     <Layout
       style={{
-        background: 'transparent',
+        background: 'white',
         minHeight: '100vh',
       }}
     >
@@ -264,6 +267,9 @@ const PropertySearch = () => {
                     style={{
                       width: '100%',
                       marginBottom: 16,
+                    }}
+                    onClick={() => {
+                      navigate(`/property?id=${property?.id}`)
                     }}
                   >
                     <Row gutter={16}>

@@ -124,4 +124,12 @@ export default {
       return error.data
     }
   },
+  getPropertyListing: async (requestObj) => {
+    try {
+      return await api.get(`${API_URLS?.get_property_listing_api}${requestObj.property_id}/`, {
+      })
+    } catch (error) {
+      return error.data
+    }
+  }
 }

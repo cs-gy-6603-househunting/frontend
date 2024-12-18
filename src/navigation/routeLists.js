@@ -57,4 +57,9 @@ export const routeLists = [
     component: AllPages.Wishlist,
     path: AllNavigation.WISHLIST,
   },
+  {
+    key: 'property-details',
+    component: AllPages.PropertyDetails,
+    path: AllNavigation.PROPERTY_DETAILS,
+  },
 ]
