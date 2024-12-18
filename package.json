@@ -1,7 +1,7 @@
 {
-  "name": "househunt-ui",
+  "name": "roomscout",
   "private": true,
-  "version": "1.0.0",
+  "version": "1.2.4",
   "type": "module",
   "scripts": {
     "dev": "vite",

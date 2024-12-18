@@ -198,7 +198,6 @@ const PropertyDetails = () => {
           </Col>
           {user?.role == 2 ? (
             <Col>
-              /*{' '}
               <Button
                 danger
                 icon={isInWishlist ? <HeartFilled /> : <HeartOutlined />}
@@ -348,7 +347,7 @@ const PropertyDetails = () => {
                   <List.Item key={item.id} onClick={() => setSelectedPoi(item)}>
                     <List.Item.Meta
                       title={item.poi_name}
-                      description={`Type: ${item.poi_type}, Ratings: ${item.poi_ratings} ⭝, Distance: ${item.distance}`}
+                      description={`Type: ${item.poi_type}, Ratings: ${item.poi_ratings} ⭐️, Distance: ${item.distance}`}
                     />
                   </List.Item>
                 )}
