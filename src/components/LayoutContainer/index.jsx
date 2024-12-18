@@ -50,8 +50,8 @@ const LayoutContainer = () => {
           padding: '10px 12px', // Add padding for menu items
         }}
         onClick={() => {
-          setProfileOpen(true);
-          setPopOverOpen(false);
+          setProfileOpen(true)
+          setPopOverOpen(false)
         }}
       >
         Profile
@@ -67,8 +67,7 @@ const LayoutContainer = () => {
         Sign Out
       </Menu.Item>
     </Menu>
-  );
-  
+  )
 
   const onProfileClose = () => {
     setProfileOpen(false)
@@ -143,7 +142,7 @@ const LayoutContainer = () => {
               {getMenuItems()}
             </Menu>
           </div>
-  
+
           {/* Center - Logo and Name */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <img
@@ -161,9 +160,16 @@ const LayoutContainer = () => {
               RoomScout
             </span>
           </div>
-  
+
           {/* Right - Profile Info */}
-          <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end', marginRight: '20px' }}>
+          <div
+            style={{
+              flex: 1,
+              display: 'flex',
+              justifyContent: 'flex-end',
+              marginRight: '20px',
+            }}
+          >
             <ProfileContainer>
               <Popover
                 trigger={'click'}
@@ -179,7 +185,7 @@ const LayoutContainer = () => {
             </ProfileContainer>
           </div>
         </Header>
-  
+
         {/* Main Content */}
         <Content style={{ padding: '50px 50px', marginTop: 64 }}>
           <Routes>
@@ -188,16 +194,16 @@ const LayoutContainer = () => {
             })}
           </Routes>
         </Content>
-  
+
         {/* Footer */}
         <Footer style={{ textAlign: 'center' }}>
           {`RoomScout © 2024. Made with ❤️ in Brooklyn.`}
         </Footer>
-  
+
         <Profile isProfileOpen={isProfileOpen} onClose={onProfileClose} />
       </Layout>
     </div>
-  )      
+  )
 }
 
 export default LayoutContainer

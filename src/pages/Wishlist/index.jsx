@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import {
   Layout,
   Row,
@@ -30,6 +31,7 @@ const { Header, Content } = Layout
 const { Title, Text } = Typography
 
 const Wishlist = () => {
+  const navigate = useNavigate()
   const [properties, setProperties] = useState([])
   const [totalCount, setTotalCount] = useState(0)
   const [pageSize, setPageSize] = useState(10)
@@ -133,7 +135,7 @@ const Wishlist = () => {
   }
 
   return (
-    <Layout style={{ background: 'transparent', minHeight: '100vh' }}>
+    <Layout style={{ background: 'white', minHeight: '100vh' }}>
       <Header style={{ background: '#fff', padding: '0 20px' }}>
         <Title level={3}>My Wishlist</Title>
       </Header>
@@ -155,6 +157,9 @@ const Wishlist = () => {
                     style={{
                       width: '100%',
                       marginBottom: 16,
+                    }}
+                    onClick={() => {
+                      navigate(`/property?id=${property?.id}`)
                     }}
                   >
                     <Row gutter={16}>
