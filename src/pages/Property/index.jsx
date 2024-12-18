@@ -181,14 +181,12 @@ const PropertyDetails = () => {
       </Modal>
       <Card bordered style={{ width: '100%' }}>
         {/* Title */}
-
         <Button
           type="text"
           icon={<ArrowLeftOutlined />}
           onClick={() => navigate(-1)}
           style={{ marginBottom: '20px' }}
         ></Button>
-
         <Row
           justify="space-between"
           align="middle"
@@ -200,7 +198,8 @@ const PropertyDetails = () => {
           </Col>
           {user?.role == 2 ? (
             <Col>
-              {/* <Button
+              /*{' '}
+              <Button
                 danger
                 icon={isInWishlist ? <HeartFilled /> : <HeartOutlined />}
                 onClick={toggleWishlist}
@@ -216,7 +215,6 @@ const PropertyDetails = () => {
         </Row>
         <Divider />
 
-        {/* Main Content */}
         <Row gutter={[16, 16]}>
           {/* Carousel of Images */}
           <Col xs={24} md={8}>
@@ -270,9 +268,7 @@ const PropertyDetails = () => {
             </Descriptions>
           </Col>
         </Row>
-
         <Divider />
-
         {/* Amenities */}
         <Descriptions title="Amenities" bordered>
           <Descriptions.Item label="Air Conditioning">
@@ -340,7 +336,6 @@ const PropertyDetails = () => {
           </Descriptions.Item>
         </Descriptions>
         <Divider />
-
         {/* Points of Interest */}
         <Row gutter={[16, 16]}>
           <Col xs={24} md={12}>
@@ -409,8 +404,7 @@ const PropertyDetails = () => {
                           <strong>Type:</strong> {selectedPoi?.poi_type}
                         </p>
                         <p>
-                          <strong>Ratings:</strong> {selectedPoi?.poi_ratings}{' '}
-                          ⭝
+                          <strong>Ratings:</strong> {selectedPoi?.poi_ratings} ⭝
                         </p>
                         <p>
                           <strong>Distance:</strong> {selectedPoi?.distance}

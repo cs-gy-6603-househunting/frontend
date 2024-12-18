@@ -1052,10 +1052,7 @@ const AddProperty = () => {
                               <Button
                                 icon={<ExportOutlined />}
                                 onClick={() => {
-                                  window.open(
-                                    `/property?id=${item?.id}`,
-                                    '_blank'
-                                  )
+                                  navigate(`/property?id=${item?.id}`)
                                 }}
                               >
                                 View Property Page
