@@ -4,7 +4,6 @@ import {
   Layout,
   Row,
   Col,
-  Card,
   Typography,
   Carousel,
   Button,
@@ -15,6 +14,7 @@ import {
   Modal,
   Checkbox,
   Table,
+  Tooltip,
 } from 'antd'
 import {
   CheckOutlined,
@@ -79,7 +79,6 @@ const Wishlist = () => {
   }
 
   const removeFromWishlist = async (property) => {
-    // togglePropertyComparison(property)
     setSelectedForComparison((prev) => prev.filter((p) => p.id !== property.id))
     const requestObj = {
       property_id: property.id,
@@ -136,10 +135,15 @@ const Wishlist = () => {
   }
 
   return (
-    <Layout style={{ background: 'white', minHeight: '100vh' }}>
-      <Header style={{ background: '#fff', padding: '0 20px' }}>
-        <Title level={3}>{`My Wishlist`}</Title>
-      </Header>
+    <Layout style={{ background: 'transparent', minHeight: '100vh' }}>
+      <Row justify="space-between" style={{ padding: '24px 24px 0' }}>
+        <Col>
+          <Title level={3} style={{ margin: 0, fontWeight: 'bold' }}>
+            My Wishlist
+          </Title>
+        </Col>
+      </Row>
+
       <Content style={{ padding: '20px' }}>
         <Spin spinning={isLoading} indicator={<LoadingOutlined spin />}>
           {properties.length === 0 && !isLoading ? (
@@ -149,121 +153,143 @@ const Wishlist = () => {
             />
           ) : (
             <List
-              grid={{ gutter: 16, column: 1 }}
+              grid={{ gutter: 20, column: 1 }}
               dataSource={properties}
               renderItem={(property) => (
-                <List.Item>
-                  <Card
-                    hoverable
+                <List.Item key={property.id}>
+                  <div
+                    className="glass"
                     style={{
-                      width: '100%',
-                      marginBottom: 16,
-                    }}
-                    onClick={(e) => {
-                      navigate(`/property?id=${property?.id}`)
-                      e.stopPropagation()
+                      padding: '10px',
+                      display: 'flex',
+                      flexDirection: 'row',
+                      flexWrap: 'wrap',
+                      justifyContent: 'space-between',
                     }}
                   >
-                    <Row gutter={16}>
-                      <Col span={8}>
-                        <Carousel autoplay>
-                          {property.images.length > 0 ? (
-                            property.images.map((image) => (
-                              <div key={image.id}>
-                                <img
-                                  src={image.url}
-                                  alt={property.title}
-                                  style={{
-                                    width: '100%',
-                                    height: 200,
-                                    objectFit: 'cover',
-                                  }}
-                                />
-                              </div>
-                            ))
-                          ) : (
-                            <div>
-                              <img
-                                src="https://via.placeholder.com/300x200"
-                                alt="Placeholder"
-                                style={{
-                                  width: '100%',
-                                  height: 200,
-                                  objectFit: 'cover',
-                                }}
-                              />
-                            </div>
-                          )}
-                        </Carousel>
-                      </Col>
-                      <Col span={16}>
-                        <div
-                          style={{
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                            alignItems: 'center',
-                          }}
-                        >
-                          <Title level={4}>${property.rent}/month</Title>
-                          <div
-                            style={{ display: 'flex', alignItems: 'center' }}
-                          >
-                            <Checkbox
-                              checked={selectedForComparison.some(
-                                (p) => p.id === property.id
-                              )}
-                              onChange={() =>
-                                togglePropertyComparison(property)
-                              }
-                              onClick={(e) => e.stopPropagation()}
-                            />
-                            {selectedForComparison.some(
-                              (p) => p.id === property.id
-                            ) && (
-                              <Button
-                                type="primary"
-                                style={{
-                                  marginLeft: '10px',
-                                }}
-                                onClick={(e) => {
-                                  showComparison()
-                                  e.stopPropagation()
-                                }} // Example: Could show comparison directly
-                              >
-                                {`Compare Now`}
-                              </Button>
-                            )}
-                            <Button
-                              type="text"
-                              icon={
-                                <HeartFilled
-                                  style={{
-                                    fontSize: '20px',
-                                    color: '#ff4d4f',
-                                  }}
-                                />
-                              }
-                              onClick={(e) => {
-                                removeFromWishlist(property)
-                                e.stopPropagation()
+                    <Carousel
+                      arrows={true}
+                      style={{
+                        width: '450px',
+                        height: '300px',
+                        padding: '0',
+                      }}
+                    >
+                      {property.images.length > 0 ? (
+                        property.images.map((image) => (
+                          <div key={image.id}>
+                            <img
+                              src={image.url}
+                              alt={property.title}
+                              style={{
+                                width: '450px',
+                                height: '300px',
+                                objectFit: 'cover',
                               }}
                             />
                           </div>
+                        ))
+                      ) : (
+                        <div>
+                          <img
+                            src="https://via.placeholder.com/300x200"
+                            alt="Placeholder"
+                            style={{
+                              width: '450px',
+                              height: '300px',
+                              objectFit: 'cover',
+                            }}
+                          />
                         </div>
-                        <Text strong>{property.title}</Text>
-                        <br />
-                        <Text type="secondary">
-                          {`📍 ${property.address.street_address}, ${property.address.city}, ${property.address.state}, ${property.address.zip_code}`}
+                      )}
+                    </Carousel>
+
+                    <div style={{ flex: 1, marginLeft: '20px' }}>
+                      <div
+                        style={{
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                        }}
+                      >
+                        <Text strong style={{ fontSize: '24px' }}>
+                          ${property.rent}/month
                         </Text>
-                        <br />
-                        <Text>
-                          {`🛏️ ${property.details.bedrooms} bd • 🛁 ${property.details.bathrooms} ba • 🏠 ${property.details.property_type}`}
+                      </div>
+
+                      <div style={{ marginTop: '10px' }}>
+                        <Text style={{ fontSize: '15px', display: 'block' }}>
+                          {property.title} 📍 {property.address.street_address},{' '}
+                          {property.address.city}, {property.address.state},{' '}
+                          {property.address.zip_code}
                         </Text>
-                        <br />
-                        <Text>{property.details.description}</Text>
-                      </Col>
-                    </Row>
-                  </Card>
+                      </div>
+
+                      <div style={{ marginTop: '10px' }}>
+                        <Text style={{ fontSize: '15px', display: 'block' }}>
+                          🛏️ {property.details.bedrooms} bd • 🛁{' '}
+                          {property.details.bathrooms} ba • 🏠{' '}
+                          {property.details.property_type}
+                        </Text>
+                      </div>
+
+                      <div style={{ marginTop: '10px' }}>
+                        <Text style={{ fontSize: '15px' }}>
+                          {property.details.description}
+                        </Text>
+                      </div>
+                    </div>
+
+                    <div
+                      style={{
+                        marginTop: '15px',
+                        gap: '10px',
+                      }}
+                    >
+                      <Tooltip title="This will lead you to property page for more details and functionalities">
+                        <Button
+                          onClick={() =>
+                            navigate(`/property?id=${property?.id}`)
+                          }
+                        >
+                          View Property Page
+                        </Button>
+                      </Tooltip>
+
+                      <Tooltip title="Select to compare properties">
+                        <Checkbox
+                          style={{ marginLeft: '10px' }}
+                          checked={selectedForComparison.some(
+                            (p) => p.id === property.id
+                          )}
+                          onChange={() => togglePropertyComparison(property)}
+                        />
+                      </Tooltip>
+
+                      {selectedForComparison.some(
+                        (p) => p.id === property.id
+                      ) && (
+                        <Button type="primary" onClick={showComparison}>
+                          Compare Now
+                        </Button>
+                      )}
+
+                      <Tooltip title="Remove from wishlist">
+                        <Button
+                          style={{ marginLeft: '10px' }}
+                          type="text"
+                          icon={
+                            <HeartFilled
+                              style={{
+                                fontSize: '20px',
+                                color: '#ff4d4f',
+                              }}
+                            />
+                          }
+                          onClick={() => removeFromWishlist(property)}
+                        />
+                      </Tooltip>
+                    </div>
+                  </div>
                 </List.Item>
               )}
             />
@@ -271,13 +297,13 @@ const Wishlist = () => {
         </Spin>
 
         {properties.length > 0 && (
-          <Row justify="end">
+          <Row justify="end" style={{ marginTop: '20px' }}>
             <Col>
               <Pagination
                 current={currentPage}
                 total={totalCount}
                 pageSize={pageSize}
-                onChange={(page, pageSize) => handlePageChange(page, pageSize)}
+                onChange={handlePageChange}
                 pageSizeOptions={[10, 30, 50, 100]}
                 showSizeChanger
               />
@@ -350,16 +376,16 @@ const Wishlist = () => {
               {
                 key: '6',
                 detail: 'Amenities',
-                children: Object.keys(selectedForComparison[0]?.amenities || {}) // Get keys from the first property's amenities
-                  .filter((amenity) => amenity !== 'property_id') // Exclude 'property_id'
+                children: Object.keys(selectedForComparison[0]?.amenities || {})
+                  .filter((amenity) => amenity !== 'property_id')
                   .map((amenity, index) => ({
-                    key: `6.${index + 1}`, // Unique key for each amenity
+                    key: `6.${index + 1}`,
                     detail: amenity
-                      .replace(/_/g, ' ') // Replace underscores with spaces
-                      .replace(/\b\w/g, (char) => char.toUpperCase()), // Capitalize words
+                      .replace(/_/g, ' ')
+                      .replace(/\b\w/g, (char) => char.toUpperCase()),
                     ...Object.fromEntries(
                       selectedForComparison.map((property, idx) => [
-                        `property${idx + 1}`, // Dynamically create property columns
+                        `property${idx + 1}`,
                         property.amenities[amenity] ? (
                           <CheckOutlined style={{ color: 'green' }} />
                         ) : (
@@ -418,7 +444,7 @@ const Wishlist = () => {
                 title: property.title,
                 dataIndex: `property${index + 1}`,
                 key: `property${index + 1}`,
-                width: 50, // Restrict property column width
+                width: 50,
               })),
             ]}
             bordered

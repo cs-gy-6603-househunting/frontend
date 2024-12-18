@@ -18,6 +18,7 @@ import {
   Empty,
   Spin,
   Pagination,
+  Tooltip,
 } from 'antd'
 import {
   SearchOutlined,
@@ -26,6 +27,7 @@ import {
   BankOutlined,
   HeartOutlined,
   HeartFilled,
+  ExportOutlined,
 } from '@ant-design/icons'
 import propertiesService from 'src/apis/propertiesService'
 import { range } from 'src/utils/utils'
@@ -59,7 +61,12 @@ const PropertySearch = () => {
       const response = await propertiesService.searchProperties(values)
 
       if (response.success) {
-        let filteredProperties = response.data.properties
+        let filteredProperties = response.data.properties.filter(
+          (property) =>
+            !property.is_deleted && property.status_verification === 3
+        )
+
+        console.log(filteredProperties)
 
         if (values.min_rent) {
           filteredProperties = filteredProperties.filter(
@@ -79,7 +86,6 @@ const PropertySearch = () => {
         setError(response.message)
       }
     } catch (err) {
-      //   setError('An error occurred while fetching properties.');
     } finally {
       setIsLoading(false)
     }
@@ -133,15 +139,15 @@ const PropertySearch = () => {
   }
 
   return (
-    <Layout
-      style={{
-        background: 'white',
-        minHeight: '100vh',
-      }}
-    >
-      <Header style={{ background: '#fff', padding: '0 20px' }}>
-        <Title level={3}>Property Search</Title>
-      </Header>
+    <Layout style={{ background: 'transparent', minHeight: '100vh' }}>
+      <Row justify="space-between" style={{ padding: '24px 24px 0' }}>
+        <Col>
+          <Title level={3} style={{ margin: 0, fontWeight: 'bold' }}>
+            Property Search
+          </Title>
+        </Col>
+      </Row>
+
       <Content style={{ padding: '20px' }}>
         <Card>
           <Form form={form} onFinish={onFinish} layout="vertical">
@@ -244,7 +250,7 @@ const PropertySearch = () => {
                 htmlType="submit"
                 icon={<SearchOutlined />}
               >
-                {`Search Properties`}
+                Search Properties
               </Button>
             </Form.Item>
           </Form>
@@ -258,50 +264,68 @@ const PropertySearch = () => {
             <Empty description="No properties found" />
           ) : (
             <List
-              grid={{ gutter: 16, column: 1 }}
+              grid={{ gutter: 20, column: 1 }}
               dataSource={properties}
               renderItem={(property) => (
                 <List.Item>
-                  <Card
-                    hoverable
+                  <div
+                    className="glass"
                     style={{
-                      width: '100%',
-                      marginBottom: 16,
-                    }}
-                    onClick={(e) => {
-                      navigate(`/property?id=${property?.id}`)
-                      e.stopPropagation()
+                      padding: '10px',
+                      display: 'flex',
+                      flexDirection: 'row',
+                      flexWrap: 'wrap',
+                      justifyContent: 'space-between',
                     }}
                   >
-                    <Row gutter={16}>
-                      <Col span={8}>
-                        <Carousel autoplay>
-                          {property.images.length !== 0 &&
-                            property.images.map((image) => (
-                              <div key={image.id}>
-                                <img
-                                  src={image.url}
-                                  alt={property.title}
-                                  style={{
-                                    width: '100%',
-                                    height: 200,
-                                    objectFit: 'cover',
-                                  }}
-                                />
-                              </div>
-                            ))}
-                        </Carousel>
-                      </Col>
-                      <Col span={16}>
-                        <div
-                          style={{
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                          }}
-                        >
-                          <Title level={4}>
-                            ${property.details.rent}/month
-                          </Title>
+                    <Carousel
+                      arrows={true}
+                      style={{
+                        width: '450px',
+                        height: '300px',
+                        padding: '0',
+                      }}
+                    >
+                      {property.images.length > 0 ? (
+                        property.images.map((image) => (
+                          <div key={image.id}>
+                            <img
+                              src={image.url}
+                              alt={property.title}
+                              style={{
+                                width: '450px',
+                                height: '300px',
+                                objectFit: 'cover',
+                              }}
+                            />
+                          </div>
+                        ))
+                      ) : (
+                        <div>
+                          <img
+                            src="https://via.placeholder.com/300x200"
+                            alt="Placeholder"
+                            style={{
+                              width: '450px',
+                              height: '300px',
+                              objectFit: 'cover',
+                            }}
+                          />
+                        </div>
+                      )}
+                    </Carousel>
+
+                    <div style={{ flex: 1, marginLeft: '20px' }}>
+                      <div
+                        style={{
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                        }}
+                      >
+                        <Text strong style={{ fontSize: '24px' }}>
+                          ${property.details.rent}/month
+                        </Text>
+                        <Tooltip title="Add to wishlist">
                           <Button
                             type="text"
                             icon={
@@ -309,51 +333,71 @@ const PropertySearch = () => {
                                 <HeartFilled
                                   style={{
                                     fontSize: '20px',
-                                    color: '#ff4d4f', // Base red color
-                                    filter:
-                                      'drop-shadow(0 0 2px rgba(255,77,79,0.3))', // Adds a subtle glow
-                                    background:
-                                      'linear-gradient(45deg, #ff4d4f, #ff7875)',
-                                    backgroundClip: 'text',
-                                    WebkitBackgroundClip: 'text',
-                                    WebkitTextFillColor: 'transparent',
+                                    color: '#ff4d4f',
                                   }}
                                 />
                               ) : (
                                 <HeartOutlined
                                   style={{
                                     fontSize: '20px',
-                                    color: '#d9d9d9', // Light gray for non-wishlist items
+                                    color: '#d9d9d9',
                                   }}
                                 />
                               )
                             }
-                            onClick={(e) => {
-                              toggleWishlist(property)
-                              e.stopPropagation()
-                            }}
+                            onClick={() => toggleWishlist(property)}
                           />
-                        </div>
-                        <Text strong>{property.title}</Text>
-                        <br />
-                        <Text type="secondary">
-                          {property.address.street_address},{' '}
-                          {property.address.city}, {property.address.state}{' '}
+                        </Tooltip>
+                      </div>
+
+                      <div style={{ marginTop: '10px' }}>
+                        <Text style={{ fontSize: '15px', display: 'block' }}>
+                          {property.title} 📍 {property.address.street_address},{' '}
+                          {property.address.city}, {property.address.state},{' '}
                           {property.address.zip_code}
                         </Text>
-                        <br />
-                        <Text>
-                          {`🛏️ ${property.details.bedrooms} bd • 🛁 ${property.details.bathrooms} ba • 🏠 ${property.details.property_type}`}
+                      </div>
+
+                      <div style={{ marginTop: '10px' }}>
+                        <Text style={{ fontSize: '15px', display: 'block' }}>
+                          🛏️ {property.details.bedrooms} bd • 🛁{' '}
+                          {property.details.bathrooms} ba • 🏠{' '}
+                          {property.details.property_type}
                         </Text>
-                        <br />
-                        <Text>{property.details.description}</Text>
-                        <br />
+                      </div>
+
+                      <div style={{ marginTop: '10px' }}>
+                        <Text style={{ fontSize: '15px' }}>
+                          {property.details.description}
+                        </Text>
+                      </div>
+
+                      <div style={{ marginTop: '10px' }}>
                         <Tag color="blue">
                           {property.distance.toFixed(2)} km away
                         </Tag>
-                      </Col>
-                    </Row>
-                  </Card>
+                      </div>
+
+                      <div
+                        style={{
+                          marginTop: '15px',
+                          display: 'flex',
+                          gap: '10px',
+                        }}
+                      >
+                        <Tooltip title="This will lead you to property page for more details and functionalities">
+                          <Button
+                            icon={<ExportOutlined />}
+                            onClick={() =>
+                              navigate(`/property?id=${property?.id}`)
+                            }
+                          >
+                            View Property Page
+                          </Button>
+                        </Tooltip>
+                      </div>
+                    </div>
+                  </div>
                 </List.Item>
               )}
             />
@@ -361,15 +405,16 @@ const PropertySearch = () => {
         </Spin>
 
         {properties.length > 0 && (
-          <Row justify="end">
+          <Row justify="end" style={{ marginTop: '20px' }}>
             <Col>
               <Pagination
                 current={currentPage}
                 total={totalCount}
                 pageSize={pageSize}
-                onChange={(page, pageSize) => handlePageChange(page, pageSize)}
+                onChange={handlePageChange}
+                x
                 pageSizeOptions={[10, 30, 50, 100]}
-                showSizeChanger={true}
+                showSizeChanger
               />
             </Col>
           </Row>

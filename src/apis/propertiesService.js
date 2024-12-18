@@ -143,4 +143,14 @@ export default {
       return error.data
     }
   },
+  deleteProperty: async (propertyId) => {
+    try {
+      const response = await api.post(API_URLS?.delete_property_api, {
+        property_id: propertyId
+      })
+      return response
+    } catch (error) {
+      return error.data
+    }
+  },
 }

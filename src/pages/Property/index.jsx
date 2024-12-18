@@ -198,7 +198,6 @@ const PropertyDetails = () => {
           </Col>
           {user?.role == 2 ? (
             <Col>
-              /*{' '}
               <Button
                 danger
                 icon={isInWishlist ? <HeartFilled /> : <HeartOutlined />}

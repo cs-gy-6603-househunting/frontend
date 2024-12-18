@@ -15,8 +15,8 @@ export const API_URLS = {
   search_properties_api: 'api/properties/search/',
   wishlist_api: 'api/properties/wishlist/',
   my_listings_api: 'api/properties/my-listings/',
-  get_property_listing_api: '/api/properties/',
   update_property_verification_status_api: '/api/properties/verify/',
+  delete_property_api: '/api/properties/delete/',
 }
 
 export const AUTH_NOT_REQUIRED_APIS = [
